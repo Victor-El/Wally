@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_home_popup_favourite"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_round_favorite_border_24"
+        android:title="@string/favourite" />
+
+    <item
+        android:id="@+id/action_home_popup_set_wallpaper"
+        android:orderInCategory="101"
+        android:icon="@drawable/ic_round_wallpaper_24"
+        android:title="@string/set_as_wallpaper" />
+
+    <item
+        android:id="@+id/action_home_popup_download"
+        android:orderInCategory="102"
+        android:icon="@drawable/ic_round_download_24"
+        android:title="@string/download" />
+</menu>

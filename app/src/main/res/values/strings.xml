@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Wally</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search_wallpapers">Search Wally…</string>
+    <string name="favourite">Add to favourites</string>
+    <string name="set_as_wallpaper">Set as wallpaper</string>
+    <string name="download">Download</string>
+    <string name="retry">Retry</string>
+    <string name="swipe_to_refresh">Swipe to refresh</string>
+    <string name="home_screen">Home Screen</string>
+    <string name="lock_screen">Lock Screen</string>
+    <string name="both">Both</string>
+    <string name="wallpaper_not_set">Wallpaper not set</string>
 </resources>

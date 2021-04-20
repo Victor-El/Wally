@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep class androidx.appcompat.widget.** { *; }
+
+-keep class me.codeenzyme.wally.commons.models.*
+-keep class me.codeenzyme.wally.home.models.*

@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
+import timber.log.Timber
 
 class WallyWallpaperManager(private val ctx: Context) {
     private val androidWallpaperManager: WallpaperManager = WallpaperManager.getInstance(ctx)
@@ -30,8 +31,13 @@ class WallyWallpaperManager(private val ctx: Context) {
 
     fun setHomeScreen(bitmap: Bitmap, cropRect: Rect? = null): Boolean {
         if (androidWallpaperManager.isSetWallpaperAllowed && androidWallpaperManager.isWallpaperSupported) {
-            val lockBitmapDrawable = androidWallpaperManager.drawable as BitmapDrawable
-            val lockBitmap = lockBitmapDrawable.bitmap
+            var lockBitmapDrawable: BitmapDrawable? = null
+            try {
+                lockBitmapDrawable = androidWallpaperManager.drawable as BitmapDrawable
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+            val lockBitmap = lockBitmapDrawable?.bitmap
             androidWallpaperManager.setBitmap(bitmap, cropRect, true, WallpaperManager.FLAG_SYSTEM)
             androidWallpaperManager.setBitmap(lockBitmap, cropRect, false, WallpaperManager.FLAG_LOCK)
         } else {

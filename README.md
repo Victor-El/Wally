@@ -1,5 +1,5 @@
 # Wally
-An open source android wallpaper application.
+An open source android HD wallpaper application.
 
 [![Android CI](https://github.com/Victor-El/Wally/actions/workflows/android.yml/badge.svg)](https://github.com/Victor-El/Wally/actions/workflows/android.yml)
 

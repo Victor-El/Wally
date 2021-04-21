@@ -1,11 +1,17 @@
 package me.codeenzyme.wally.commons.utils
 
+import android.Manifest
 import android.app.WallpaperManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
+import androidx.core.content.ContextCompat
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.listener.single.DialogOnDeniedPermissionListener
+import me.codeenzyme.wally.R
 import timber.log.Timber
 
 class WallyWallpaperManager(private val ctx: Context) {
@@ -30,14 +36,24 @@ class WallyWallpaperManager(private val ctx: Context) {
     }
 
     fun setHomeScreen(bitmap: Bitmap, cropRect: Rect? = null): Boolean {
+        val listener = DialogOnDeniedPermissionListener.Builder
+            .withContext(ctx)
+            .withTitle("External storage permission")
+            .withMessage("External storage permission is needed to set wallpaper to only home screen.")
+            .withButtonText(android.R.string.ok)
+            .withIcon(R.mipmap.ic_launcher)
+            .build()
+        Dexter.withContext(ctx)
+            .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            .withListener(listener)
+            .check()
+
+        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            return false
+        }
         if (androidWallpaperManager.isSetWallpaperAllowed && androidWallpaperManager.isWallpaperSupported) {
-            var lockBitmapDrawable: BitmapDrawable? = null
-            try {
-                lockBitmapDrawable = androidWallpaperManager.drawable as BitmapDrawable
-            } catch (e: Exception) {
-                Timber.e(e)
-            }
-            val lockBitmap = lockBitmapDrawable?.bitmap
+            val lockBitmapDrawable= androidWallpaperManager.drawable as BitmapDrawable
+            val lockBitmap = lockBitmapDrawable.bitmap
             androidWallpaperManager.setBitmap(bitmap, cropRect, true, WallpaperManager.FLAG_SYSTEM)
             androidWallpaperManager.setBitmap(lockBitmap, cropRect, false, WallpaperManager.FLAG_LOCK)
         } else {

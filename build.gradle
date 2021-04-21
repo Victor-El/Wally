@@ -15,6 +15,7 @@ buildscript {
         sentry_version = "4.3.0"
         shimmer_version = "0.5.0"
         image_cropper = "2.8.0"
+        dexter_version = "6.2.2"
     }
     repositories {
         google()

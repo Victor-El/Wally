@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="50dp"
     android:background="@color/black"
     android:orientation="vertical">
 
@@ -18,7 +19,7 @@
         android:gravity="center"
         android:text="@string/home_screen"
         android:textColor="@color/white"
-        android:textSize="30sp" />
+        android:textSize="24sp" />
 
     <TextView
         android:id="@+id/set_lock_screen_wallpaper"
@@ -30,7 +31,7 @@
         android:gravity="center"
         android:text="@string/lock_screen"
         android:textColor="@color/white"
-        android:textSize="30sp" />
+        android:textSize="24sp" />
 
     <TextView
         android:id="@+id/set_both_screens_wallpaper"
@@ -43,6 +44,6 @@
         android:gravity="center"
         android:text="@string/both"
         android:textColor="@color/white"
-        android:textSize="30sp" />
+        android:textSize="24sp" />
 
 </LinearLayout>

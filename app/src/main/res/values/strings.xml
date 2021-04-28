@@ -12,4 +12,6 @@
     <string name="lock_screen">Lock Screen</string>
     <string name="both">Both</string>
     <string name="wallpaper_not_set">Wallpaper not set</string>
+    <string name="error_loading_wallpapers">Error loading wallpapers</string>
+    <string name="no_wallpaper_found">No wallpaper found</string>
 </resources>

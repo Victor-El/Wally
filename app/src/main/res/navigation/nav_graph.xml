@@ -23,4 +23,7 @@
             android:name="target"
             app:argType="me.codeenzyme.wally.commons.views.SetCroppedImageFragment$Data" />
     </fragment>
+    <action
+        android:id="@+id/action_global_homeFragment"
+        app:destination="@id/homeFragment" />
 </navigation>

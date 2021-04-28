@@ -36,17 +36,6 @@ class WallyWallpaperManager(private val ctx: Context) {
     }
 
     fun setHomeScreen(bitmap: Bitmap, cropRect: Rect? = null): Boolean {
-        val listener = DialogOnDeniedPermissionListener.Builder
-            .withContext(ctx)
-            .withTitle("External storage permission")
-            .withMessage("External storage permission is needed to set wallpaper to only home screen.")
-            .withButtonText(android.R.string.ok)
-            .withIcon(R.mipmap.ic_launcher)
-            .build()
-        Dexter.withContext(ctx)
-            .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            .withListener(listener)
-            .check()
 
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             return false
@@ -67,6 +56,20 @@ class WallyWallpaperManager(private val ctx: Context) {
 
         fun getInstance(context: Context): WallyWallpaperManager {
             return wallyWallpaperManager ?: (WallyWallpaperManager(context).also { wallyWallpaperManager = it })
+        }
+
+        fun wallpaperPermission(context: Context) {
+            val listener = DialogOnDeniedPermissionListener.Builder
+                .withContext(context)
+                .withTitle("External storage permission")
+                .withMessage("External storage permission is needed to set wallpaper to only home screen.")
+                .withButtonText(android.R.string.ok)
+                .withIcon(R.mipmap.ic_launcher)
+                .build()
+            Dexter.withContext(context)
+                .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withListener(listener)
+                .check()
         }
 
     }

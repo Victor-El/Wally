@@ -22,14 +22,17 @@ class SelectWallpaperTargetDialog: DialogFragment(R.layout.dialog_fragment_layou
         viewBinding.let {
             it.setHomeScreenTv.setOnClickListener {
                 listener.onHomeSelected()
+                dismiss()
             }
 
             it.setLockScreenWallpaper.setOnClickListener {
                 listener.onLockSelected()
+                dismiss()
             }
 
             it.setBothScreensWallpaper.setOnClickListener {
                 listener.onBothSelected()
+                dismiss()
             }
         }
     }

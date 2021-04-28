@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.codeenzyme.wally.R
+import me.codeenzyme.wally.commons.models.Photo
 import me.codeenzyme.wally.commons.models.WallpaperDataNetworkState
 import me.codeenzyme.wally.commons.views.SelectWallpaperTargetDialog
 import me.codeenzyme.wally.commons.views.SetCroppedImageFragment
@@ -51,6 +53,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         viewBinding = FragmentHomeBinding.bind(view)
         viewBinding.run {
             homeSwipeRefreshLayout.setColorSchemeResources(
@@ -124,7 +127,10 @@ class HomeFragment : Fragment() {
                                         )
                                     }
                                 })
-                                selectWallpaperTargetDialog.show(requireActivity().supportFragmentManager, "selectDialog")
+                                selectWallpaperTargetDialog.show(
+                                    requireActivity().supportFragmentManager,
+                                    "selectDialog"
+                                )
                             }
                         }
                         true
@@ -136,10 +142,15 @@ class HomeFragment : Fragment() {
                 if (viewBinding.homeSwipeRefreshLayout.isRefreshing && it.source.append is LoadState.Loading) {
                     viewBinding.homeSwipeRefreshLayout.isRefreshing = false
                 }
+                viewBinding.noPhotosFoundView.isVisible =
+                    it.append is LoadState.Loading && homeWallpaperRecyclerAdapter.itemCount == 0
             }
+            val footerAdapter =
+                HomePagedWallpaperAdapter.HomeLoadStateAdapter(homeWallpaperRecyclerAdapter::retry)
+            val concatAdapter = homeWallpaperRecyclerAdapter.withLoadStateFooter(footerAdapter)
             homeWallpaperRecyclerView.layoutManager =
                 StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-            homeWallpaperRecyclerView.adapter = homeWallpaperRecyclerAdapter
+            homeWallpaperRecyclerView.adapter = concatAdapter
         }
 
         selectWallpaperTargetDialog = SelectWallpaperTargetDialog()

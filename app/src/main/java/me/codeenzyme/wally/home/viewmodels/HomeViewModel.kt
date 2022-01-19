@@ -1,5 +1,6 @@
 package me.codeenzyme.wally.home.viewmodels
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -7,6 +8,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +26,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     // private val pagingSource: HomeWallpaperPagingSource,
     private val homeScreenWallpaperService: HomeScreenWallpaperService,
-    private val wallyDownloader: WallyDownloader
+    private val wallyDownloader: WallyDownloader,
 ): ViewModel() {
 
     private lateinit var pagingSource: HomeWallpaperPagingSource
@@ -33,9 +35,16 @@ class HomeViewModel @Inject constructor(
         pagingSource
     }.flow.cachedIn(viewModelScope)*/
 
-    fun homeWallpaperFlow(query: String?): Flow<PagingData<Photo>> {
+    fun homeWallpaperFlow(query: String?, safeSearch: Boolean, orientation: String, imageType: String, order: String): Flow<PagingData<Photo>> {
         return Pager(PagingConfig(HOME_WALLPAPER_PAGE_SIZE)) {
-            pagingSource = HomeWallpaperPagingSource(homeScreenWallpaperService, query)
+            pagingSource = HomeWallpaperPagingSource(
+                homeScreenWallpaperService,
+                safeSearch,
+                orientation,
+                imageType,
+                order,
+                query
+            )
             pagingSource
         }.flow.cachedIn(viewModelScope)
     }

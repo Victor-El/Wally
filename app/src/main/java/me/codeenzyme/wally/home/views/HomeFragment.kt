@@ -28,6 +28,9 @@ import kotlinx.coroutines.launch
 import me.codeenzyme.wally.R
 import me.codeenzyme.wally.commons.models.Photo
 import me.codeenzyme.wally.commons.models.WallpaperDataNetworkState
+import me.codeenzyme.wally.commons.preferencestore.*
+import me.codeenzyme.wally.commons.utils.ALL
+import me.codeenzyme.wally.commons.utils.POPULAR
 import me.codeenzyme.wally.commons.views.SelectWallpaperTargetDialog
 import me.codeenzyme.wally.commons.views.SetCroppedImageFragment
 import me.codeenzyme.wally.commons.views.SetCroppedImageFragmentArgs
@@ -159,13 +162,32 @@ class HomeFragment() : Fragment() {
 
         selectWallpaperTargetDialog = SelectWallpaperTargetDialog()
 
-        startObservingNetworkState()
-        loadData(null)
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            requireContext().settingsPref.data.collect {
+                val safeSearch = it[SAFE_SEARCH_PREF_KEY] ?: true
+                val orientation = it[ORIENTATION_PREF_KEY] ?: ALL
+                val imageType = it[IMAGE_TYPE_PREF_KEY] ?: ALL
+                val order = it[ORDER_PREF_KEY] ?: POPULAR
+
+                loadData(null, safeSearch, orientation, imageType, order)
+                startObservingNetworkState()
+            }
+        }
 
         viewBinding.actionSearchView.setOnEditorActionListener { tv: TextView, aID: Int, _ ->
             var handled = false
             if (aID == EditorInfo.IME_ACTION_SEARCH) {
-                loadData(viewBinding.actionSearchView.text.toString())
+                viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                    requireContext().settingsPref.data.collect {
+                        val safeSearch = it[SAFE_SEARCH_PREF_KEY] ?: true
+                        val orientation = it[ORIENTATION_PREF_KEY] ?: ALL
+                        val imageType = it[IMAGE_TYPE_PREF_KEY] ?: ALL
+                        val order = it[ORDER_PREF_KEY] ?: POPULAR
+
+                        loadData(viewBinding.actionSearchView.text.toString(), safeSearch, orientation, imageType, order)
+                        startObservingNetworkState()
+                    }
+                }
                 handled = true
             }
             handled
@@ -202,9 +224,9 @@ class HomeFragment() : Fragment() {
         }
     }
 
-    private fun loadData(query: String?) {
+    private fun loadData(query: String?, safeSearch: Boolean, orientation: String, imageType: String, order: String) {
         viewLifecycleOwner.lifecycleScope.launch {
-            homeViewModel.homeWallpaperFlow(query).collectLatest {
+            homeViewModel.homeWallpaperFlow(query, safeSearch, orientation, imageType, order).collectLatest {
                 homeWallpaperRecyclerAdapter.submitData(it)
             }
         }

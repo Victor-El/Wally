@@ -1,11 +1,16 @@
 package me.codeenzyme.wally.home.repository
 
+import android.content.Context
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import me.codeenzyme.wally.commons.models.Photo
 import me.codeenzyme.wally.commons.models.WallpaperDataNetworkState
+import me.codeenzyme.wally.commons.preferencestore.*
+import me.codeenzyme.wally.commons.utils.ALL
+import me.codeenzyme.wally.commons.utils.POPULAR
 import me.codeenzyme.wally.home.data.remote.HomeScreenWallpaperService
 import retrofit2.HttpException
 import timber.log.Timber
@@ -14,6 +19,10 @@ import javax.inject.Inject
 
 class HomeWallpaperPagingSource constructor(
     private val homeScreenWallpaperService: HomeScreenWallpaperService,
+    private val safeSearch: Boolean,
+    private val orientation: String,
+    private val imageType: String,
+    private val order: String,
     private val searchTerm: String? = null
 ): PagingSource<Int, Photo>(){
 
@@ -34,7 +43,14 @@ class HomeWallpaperPagingSource constructor(
                 Timber.d("Starting initial retrofit request")
                 getHomeWallpaperDateWithNetworkFlow.value = WallpaperDataNetworkState.Loading
             }
-            val response = homeScreenWallpaperService.getHomeScreenWallpaper(nextPageNumber, query = searchTerm)
+            val response = homeScreenWallpaperService.getHomeScreenWallpaper(
+                nextPageNumber,
+                query = searchTerm,
+                safeSearch = safeSearch,
+                orientation = orientation,
+                imagetype = imageType,
+                order = order
+            )
             if (nextPageNumber == 1) {
                 getHomeWallpaperDateWithNetworkFlow.value = WallpaperDataNetworkState.Success
             }

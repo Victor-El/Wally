@@ -37,6 +37,7 @@ import me.codeenzyme.wally.commons.views.SetCroppedImageFragmentArgs
 import me.codeenzyme.wally.databinding.FragmentHomeBinding
 import me.codeenzyme.wally.home.viewmodels.HomeViewModel
 import me.codeenzyme.wally.home.views.adapters.HomePagedWallpaperAdapter
+import timber.log.Timber
 import java.io.File
 
 @AndroidEntryPoint
@@ -91,11 +92,8 @@ class HomeFragment() : Fragment() {
                             }
 
                             R.id.action_home_popup_favourite -> {
-                                Snackbar.make(
-                                    viewBinding.root,
-                                    "Adding to favourites...",
-                                    Snackbar.LENGTH_LONG
-                                ).show()
+                                Timber.d(photo.toString())
+                                homeViewModel.addToFavourites(photo)
                             }
 
                             R.id.action_home_popup_set_wallpaper -> {

@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import me.codeenzyme.wally.commons.models.Photo
 import me.codeenzyme.wally.commons.models.WallpaperDataNetworkState
+import me.codeenzyme.wally.commons.repositories.FavouritePhotosRepository
 import me.codeenzyme.wally.commons.utils.HOME_WALLPAPER_PAGE_SIZE
 import me.codeenzyme.wally.commons.utils.WallyDownloader
 import me.codeenzyme.wally.home.data.remote.HomeScreenWallpaperService
@@ -27,6 +29,7 @@ class HomeViewModel @Inject constructor(
     // private val pagingSource: HomeWallpaperPagingSource,
     private val homeScreenWallpaperService: HomeScreenWallpaperService,
     private val wallyDownloader: WallyDownloader,
+    private val favouritesService: FavouritePhotosRepository
 ): ViewModel() {
 
     private lateinit var pagingSource: HomeWallpaperPagingSource
@@ -61,5 +64,11 @@ class HomeViewModel @Inject constructor(
     }
 
     fun startDownload(url: String) = wallyDownloader.startDownload(url)
+
+    fun addToFavourites(photo: Photo) {
+        viewModelScope.launch {
+            favouritesService.put(photo)
+        }
+    }
 
 }

@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_homeFragment_to_setCroppedImageFragment"
             app:destination="@id/setCroppedImageFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/setCroppedImageFragment"
@@ -26,4 +29,42 @@
     <action
         android:id="@+id/action_global_homeFragment"
         app:destination="@id/homeFragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="me.codeenzyme.wally.settings.views.SettingsFragment"
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_orientationDialog"
+            app:destination="@id/orientationDialog" />
+        <action
+            android:id="@+id/action_settingsFragment_to_imageTypeDialog"
+            app:destination="@id/imageTypeDialog" />
+        <action
+            android:id="@+id/action_settingsFragment_to_orderDialog"
+            app:destination="@id/orderDialog" />
+    </fragment>
+    <dialog
+        android:id="@+id/orientationDialog"
+        android:name="me.codeenzyme.wally.settings.views.dialogs.OrientationDialog"
+        android:label="OrientationDialog" >
+        <argument
+            android:name="orientation"
+            app:argType="string" />
+    </dialog>
+    <dialog
+        android:id="@+id/imageTypeDialog"
+        android:name="me.codeenzyme.wally.settings.views.dialogs.ImageTypeDialog"
+        android:label="ImageTypeDialog" >
+        <argument
+            android:name="imageType"
+            app:argType="string" />
+    </dialog>
+    <dialog
+        android:id="@+id/orderDialog"
+        android:name="me.codeenzyme.wally.settings.views.dialogs.OrderDialog"
+        android:label="OrderDialog" >
+        <argument
+            android:name="order"
+            app:argType="string" />
+    </dialog>
 </navigation>

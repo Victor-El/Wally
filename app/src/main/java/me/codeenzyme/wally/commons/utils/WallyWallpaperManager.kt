@@ -28,7 +28,7 @@ class WallyWallpaperManager(private val ctx: Context) {
 
     fun setBothLockScreenAndHomeScreen(bitmap: Bitmap, cropRect: Rect? = null): Boolean {
         if (androidWallpaperManager.isSetWallpaperAllowed && androidWallpaperManager.isWallpaperSupported) {
-            androidWallpaperManager.setBitmap(bitmap, cropRect, true, WallpaperManager.FLAG_SYSTEM)
+            androidWallpaperManager.setBitmap(bitmap, cropRect, true, WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
         } else {
             return false
         }

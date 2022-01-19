@@ -14,4 +14,25 @@
     <string name="wallpaper_not_set">Wallpaper not set</string>
     <string name="error_loading_wallpapers">Error loading wallpapers</string>
     <string name="no_wallpaper_found">No wallpaper found</string>
+    <string name="downloading_wallpaer">Downloading new wallpaper</string>
+    <string name="download_in_progress">Download in progress</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="settings">Settings</string>
+    <string name="safesearch">SafeSearch</string>
+    <string name="orientation">Orientation</string>
+    <string name="image_type">Image type</string>
+    <string name="order">Order</string>
 </resources>

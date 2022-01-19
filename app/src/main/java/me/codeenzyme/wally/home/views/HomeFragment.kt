@@ -2,9 +2,12 @@ package me.codeenzyme.wally.home.views
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -34,7 +37,7 @@ import me.codeenzyme.wally.home.views.adapters.HomePagedWallpaperAdapter
 import java.io.File
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment() : Fragment() {
 
     private lateinit var homeWallpaperRecyclerAdapter: HomePagedWallpaperAdapter
 
@@ -76,6 +79,7 @@ class HomeFragment : Fragment() {
                     it.setOnMenuItemClickListener { menuItem ->
                         when (menuItem.itemId) {
                             R.id.action_home_popup_download -> {
+                                homeViewModel.startDownload(photo.largeImageURL)
                                 Snackbar.make(
                                     viewBinding.root,
                                     "Downloading...",
@@ -156,7 +160,20 @@ class HomeFragment : Fragment() {
         selectWallpaperTargetDialog = SelectWallpaperTargetDialog()
 
         startObservingNetworkState()
-        loadData()
+        loadData(null)
+
+        viewBinding.actionSearchView.setOnEditorActionListener { tv: TextView, aID: Int, _ ->
+            var handled = false
+            if (aID == EditorInfo.IME_ACTION_SEARCH) {
+                loadData(viewBinding.actionSearchView.text.toString())
+                handled = true
+            }
+            handled
+        }
+
+        viewBinding.actionSettings.setOnClickListener {
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToSettingsFragment())
+        }
     }
 
     private fun startObservingNetworkState() {
@@ -185,9 +202,9 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun loadData() {
+    private fun loadData(query: String?) {
         viewLifecycleOwner.lifecycleScope.launch {
-            homeViewModel.homeWallpaperFlow.collectLatest {
+            homeViewModel.homeWallpaperFlow(query).collectLatest {
                 homeWallpaperRecyclerAdapter.submitData(it)
             }
         }

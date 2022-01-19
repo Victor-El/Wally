@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <RadioGroup
+        android:id="@+id/image_type_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RadioButton
+            android:id="@+id/image_type_all"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="All"/>
+
+        <RadioButton
+            android:id="@+id/image_type_photo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Photo"/>
+
+        <RadioButton
+            android:id="@+id/image_type_illustration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Illustration"/>
+
+        <RadioButton
+            android:id="@+id/image_type_vector"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vector"/>
+
+    </RadioGroup>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

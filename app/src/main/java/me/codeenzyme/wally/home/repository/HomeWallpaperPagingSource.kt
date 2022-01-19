@@ -7,12 +7,14 @@ import kotlinx.coroutines.flow.StateFlow
 import me.codeenzyme.wally.commons.models.Photo
 import me.codeenzyme.wally.commons.models.WallpaperDataNetworkState
 import me.codeenzyme.wally.home.data.remote.HomeScreenWallpaperService
+import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
-class HomeWallpaperPagingSource @Inject constructor(
-    private val homeScreenWallpaperService: HomeScreenWallpaperService
+class HomeWallpaperPagingSource constructor(
+    private val homeScreenWallpaperService: HomeScreenWallpaperService,
+    private val searchTerm: String? = null
 ): PagingSource<Int, Photo>(){
 
     private val getHomeWallpaperDateWithNetworkFlow: MutableStateFlow<WallpaperDataNetworkState> = MutableStateFlow(WallpaperDataNetworkState.Loading)
@@ -32,13 +34,16 @@ class HomeWallpaperPagingSource @Inject constructor(
                 Timber.d("Starting initial retrofit request")
                 getHomeWallpaperDateWithNetworkFlow.value = WallpaperDataNetworkState.Loading
             }
-            val response = homeScreenWallpaperService.getHomeScreenWallpaper(nextPageNumber)
+            val response = homeScreenWallpaperService.getHomeScreenWallpaper(nextPageNumber, query = searchTerm)
             if (nextPageNumber == 1) {
                 getHomeWallpaperDateWithNetworkFlow.value = WallpaperDataNetworkState.Success
             }
             Timber.d(response.hits.toString())
             LoadResult.Page(response.hits, null, nextPageNumber + 1)
         } catch (e: Exception) {
+            if (e is HttpException) {
+                return LoadResult.Page(emptyList(), null, null)
+            }
             Timber.d(e)
             if (nextPageNumber == 1 && e is IOException) {
                 getHomeWallpaperDateWithNetworkFlow.value = WallpaperDataNetworkState.Failure

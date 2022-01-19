@@ -11,4 +11,5 @@
     <color name="black_tint">#262626</color>
     <color name="golden">#ffd900</color>
     <color name="dark_golden">#fe7a00</color>
+    <color name="settings_card_background">#232323</color>
 </resources>

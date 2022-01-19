@@ -9,7 +9,7 @@ buildscript {
         room_version = "2.2.6"
         glide_version = "4.12.0"
         retrofit_version = "2.9.0"
-        datastore_version = "1.0.0-alpha08"
+        datastore_version = "1.0.0"
         logging_interceptor_version = "4.9.1"
         timber_version = "4.7.1"
         sentry_version = "4.3.0"

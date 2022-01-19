@@ -34,7 +34,7 @@
 
                 <ImageView
                     android:layout_width="0dp"
-                    android:layout_height="300dp"
+                    android:layout_height="250dp"
                     android:scaleType="centerCrop"
                     android:background="@color/black"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -71,7 +71,7 @@
             <ImageView
                 android:id="@+id/photo_item_view"
                 android:layout_width="0dp"
-                android:layout_height="300dp"
+                android:layout_height="250dp"
                 android:scaleType="centerCrop"
                 android:background="@color/black_tint"
                 app:layout_constraintBottom_toBottomOf="parent"

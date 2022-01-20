@@ -63,6 +63,13 @@ class HomeFragment() : Fragment() {
 
         viewBinding = FragmentHomeBinding.bind(view)
         viewBinding.run {
+
+            actionFavourite.setOnClickListener {
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeFragmentToFavouritesFragment()
+                )
+            }
+
             homeSwipeRefreshLayout.setColorSchemeResources(
                 R.color.golden,
                 R.color.black_tint,

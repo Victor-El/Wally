@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_homeFragment_to_fullImageFragment"
             app:destination="@id/fullImageFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_favouritesFragment"
+            app:destination="@id/favouritesFragment" />
     </fragment>
     <fragment
         android:id="@+id/setCroppedImageFragment"
@@ -77,5 +80,13 @@
         <argument
             android:name="photo"
             app:argType="me.codeenzyme.wally.commons.models.Photo" />
+    </fragment>
+    <fragment
+        android:id="@+id/favouritesFragment"
+        android:name="me.codeenzyme.wally.commons.views.FavouritesFragment"
+        android:label="FavouritesFragment" >
+        <action
+            android:id="@+id/action_favouritesFragment_to_fullImageFragment"
+            app:destination="@id/fullImageFragment" />
     </fragment>
 </navigation>

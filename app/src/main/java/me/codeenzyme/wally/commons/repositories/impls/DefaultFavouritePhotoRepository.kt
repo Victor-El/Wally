@@ -1,5 +1,7 @@
 package me.codeenzyme.wally.commons.repositories.impls
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import me.codeenzyme.wally.commons.data.local.PhotoDatabase
 import me.codeenzyme.wally.commons.data.local.entities.PhotoEntity
 import me.codeenzyme.wally.commons.models.Photo
@@ -9,9 +11,11 @@ import javax.inject.Inject
 class DefaultFavouritePhotoRepository @Inject constructor(
     private val photoDatabase: PhotoDatabase
 ): FavouritePhotosRepository {
-    override suspend fun fetch(): List<Photo> {
+    override fun fetch(): Flow<List<Photo>> {
         return photoDatabase.photoDao().getAll().map {
-            PhotoEntity.toPhoto(it)
+            it.map {
+                PhotoEntity.toPhoto(it)
+            }
         }
     }
 

@@ -77,7 +77,7 @@ class HomeFragment() : Fragment() {
                 homeWallpaperRecyclerAdapter.retry()
                 homeSwipeRefreshLayout.isEnabled = false
             }
-            homeWallpaperRecyclerAdapter = HomePagedWallpaperAdapter { photo, _, view ->
+            homeWallpaperRecyclerAdapter = HomePagedWallpaperAdapter ({ photo, _, view ->
                 val popupMenu = PopupMenu(requireContext(), view).also {
                     it.inflate(R.menu.menu_home_wallpaper)
                     it.setOnMenuItemClickListener { menuItem ->
@@ -92,8 +92,12 @@ class HomeFragment() : Fragment() {
                             }
 
                             R.id.action_home_popup_favourite -> {
-                                Timber.d(photo.toString())
                                 homeViewModel.addToFavourites(photo)
+                                Snackbar.make(
+                                    viewBinding.root,
+                                    "Added to favorite",
+                                    Snackbar.LENGTH_LONG
+                                ).show()
                             }
 
                             R.id.action_home_popup_set_wallpaper -> {
@@ -142,6 +146,10 @@ class HomeFragment() : Fragment() {
                     }
                 }
                 popupMenu.show()
+            }) {
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeFragmentToFullImageFragment(it)
+                )
             }
             homeWallpaperRecyclerAdapter.addLoadStateListener {
                 if (viewBinding.homeSwipeRefreshLayout.isRefreshing && it.source.append is LoadState.Loading) {

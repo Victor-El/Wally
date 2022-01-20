@@ -26,12 +26,15 @@ import me.codeenzyme.wally.databinding.ItemPhotoLayoutBinding
 import me.codeenzyme.wally.databinding.LayoutHomeLoadStateBinding
 import timber.log.Timber
 
-class HomePagedWallpaperAdapter(private val actionMoreListener: (Photo, Int, View) -> Unit) :
+class HomePagedWallpaperAdapter(private val actionMoreListener: (Photo, Int, View) -> Unit, private val callBack: (Photo) -> Unit) :
     PagingDataAdapter<Photo, HomePagedWallpaperAdapter.PhotoItemViewHolder>(PhotoComparator) {
 
     inner class PhotoItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(photo: Photo, pos: Int) {
             val viewBinding = ItemPhotoLayoutBinding.bind(itemView)
+            viewBinding.root.setOnClickListener {
+                callBack(photo)
+            }
             viewBinding.moreActionImageView.run {
                 isVisible = false
                 setOnClickListener { actionMoreListener(photo, pos, it) }

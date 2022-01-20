@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_homeFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_fullImageFragment"
+            app:destination="@id/fullImageFragment" />
     </fragment>
     <fragment
         android:id="@+id/setCroppedImageFragment"
@@ -67,4 +70,12 @@
             android:name="order"
             app:argType="string" />
     </dialog>
+    <fragment
+        android:id="@+id/fullImageFragment"
+        android:name="me.codeenzyme.wally.commons.views.FullImageFragment"
+        android:label="FullImageFragment" >
+        <argument
+            android:name="photo"
+            app:argType="me.codeenzyme.wally.commons.models.Photo" />
+    </fragment>
 </navigation>

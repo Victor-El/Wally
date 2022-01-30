@@ -51,6 +51,9 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
             viewModel.removeFavourite(it)
         }
         viewBinding?.let {
+            it.actionSettingsClose.setOnClickListener {
+                findNavController().navigateUp()
+            }
             it.favouritesRecyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             it.favouritesRecyclerView.adapter = adapter
         }

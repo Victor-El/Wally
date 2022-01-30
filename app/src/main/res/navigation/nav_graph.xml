@@ -80,6 +80,9 @@
         <argument
             android:name="photo"
             app:argType="me.codeenzyme.wally.commons.models.Photo" />
+        <action
+            android:id="@+id/action_fullImageFragment_to_setCroppedImageFragment"
+            app:destination="@id/setCroppedImageFragment" />
     </fragment>
     <fragment
         android:id="@+id/favouritesFragment"

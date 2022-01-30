@@ -67,7 +67,7 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
                     SelectWallpaperTargetDialog.SelectTargetListener {
                     override fun onHomeSelected() {
                         findNavController().navigate(
-                            HomeFragmentDirections.actionHomeFragmentToSetCroppedImageFragment(
+                            FullImageFragmentDirections.actionFullImageFragmentToSetCroppedImageFragment(
                                 SetCroppedImageFragment.Data(
                                     SetCroppedImageFragment.WallpaperTarget.HOME,
                                     arg.photo.largeImageURL
@@ -78,7 +78,7 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
 
                     override fun onLockSelected() {
                         findNavController().navigate(
-                            HomeFragmentDirections.actionHomeFragmentToSetCroppedImageFragment(
+                            FullImageFragmentDirections.actionFullImageFragmentToSetCroppedImageFragment(
                                 SetCroppedImageFragment.Data(
                                     SetCroppedImageFragment.WallpaperTarget.LOCK,
                                     arg.photo.largeImageURL
@@ -89,7 +89,7 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
 
                     override fun onBothSelected() {
                         findNavController().navigate(
-                            HomeFragmentDirections.actionHomeFragmentToSetCroppedImageFragment(
+                            FullImageFragmentDirections.actionFullImageFragmentToSetCroppedImageFragment(
                                 SetCroppedImageFragment.Data(
                                     SetCroppedImageFragment.WallpaperTarget.BOTH,
                                     arg.photo.largeImageURL
@@ -109,7 +109,7 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
                 viewModel.addToFavourites(arg.photo)
                 Snackbar.make(
                     viewBinding!!.root,
-                    "Downloading...",
+                    "Adding to Favourites ... ",
                     Snackbar.LENGTH_LONG
                 ).show()
             }

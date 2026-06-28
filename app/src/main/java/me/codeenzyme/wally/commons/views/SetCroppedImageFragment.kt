@@ -50,8 +50,6 @@ class SetCroppedImageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val viewBinding = FragmentSetCroppedImageBinding.bind(view)
 
-        WallyWallpaperManager.wallpaperPermission(requireContext())
-
         val displayMetrics = DisplayMetrics()
         requireActivity().windowManager.defaultDisplay.getRealMetrics(displayMetrics)
         Timber.d(displayMetrics.widthPixels.toString())
@@ -81,41 +79,37 @@ class SetCroppedImageFragment : Fragment() {
                 viewBinding.cropImageProgressBar.isVisible = true
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
                     val wallpaperManager = WallyWallpaperManager.getInstance(requireContext())
-                    when (wallpaperTarget.target.target) {
-                        WallpaperTarget.HOME -> {
-                            if (!wallpaperManager.setHomeScreen(
-                                    viewBinding.cropImageView.croppedImage,
+                    val croppedImage = viewBinding.cropImageView.croppedImage
+                    if (croppedImage != null) {
+                        val success = when (wallpaperTarget.target.target) {
+                            WallpaperTarget.HOME -> {
+                                wallpaperManager.setHomeScreen(
+                                    croppedImage,
                                     null
                                 )
-                            ) {
+                            }
+                            WallpaperTarget.LOCK -> {
+                                wallpaperManager.setLockScreen(
+                                    croppedImage,
+                                    null
+                                )
+                            }
+                            WallpaperTarget.BOTH -> {
+                                wallpaperManager.setBothLockScreenAndHomeScreen(
+                                    croppedImage,
+                                    null
+                                )
+                            }
+                        }
+
+                        if (!success) {
+                            withContext(Dispatchers.Main) {
                                 Snackbar.make(
                                     viewBinding.root,
                                     requireContext().getString(R.string.wallpaper_not_set),
                                     Snackbar.LENGTH_LONG
                                 ).show()
                             }
-                        }
-                        WallpaperTarget.LOCK -> if (!wallpaperManager.setLockScreen(
-                                viewBinding.cropImageView.croppedImage,
-                                null
-                            )
-                        ) {
-                            Snackbar.make(
-                                viewBinding.root,
-                                requireContext().getString(R.string.wallpaper_not_set),
-                                Snackbar.LENGTH_LONG
-                            ).show()
-                        }
-                        WallpaperTarget.BOTH -> if (!wallpaperManager.setBothLockScreenAndHomeScreen(
-                                viewBinding.cropImageView.croppedImage,
-                                null
-                            )
-                        ) {
-                            Snackbar.make(
-                                viewBinding.root,
-                                requireContext().getString(R.string.wallpaper_not_set),
-                                Snackbar.LENGTH_LONG
-                            ).show()
                         }
                     }
                     withContext(Dispatchers.Main) {

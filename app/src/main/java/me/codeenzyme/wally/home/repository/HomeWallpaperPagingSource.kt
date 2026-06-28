@@ -23,15 +23,13 @@ class HomeWallpaperPagingSource constructor(
     private val orientation: String,
     private val imageType: String,
     private val order: String,
-    private val searchTerm: String? = null
+    private val searchTerm: String? = null,
+    private val networkStateFlow: MutableStateFlow<WallpaperDataNetworkState>
 ): PagingSource<Int, Photo>(){
-
-    private val getHomeWallpaperDateWithNetworkFlow: MutableStateFlow<WallpaperDataNetworkState> = MutableStateFlow(WallpaperDataNetworkState.Loading)
-    val wallpaperDataNetworkLoadingState: StateFlow<WallpaperDataNetworkState> = getHomeWallpaperDateWithNetworkFlow
 
     override fun getRefreshKey(state: PagingState<Int, Photo>): Int? {
         return state.anchorPosition.let { anchorPosition ->
-            val anchorPage = state.closestPageToPosition(anchorPosition!!)
+            val anchorPage = state.closestPageToPosition(anchorPosition ?: return null)
             anchorPage?.nextKey?.plus(1) ?: anchorPage?.prevKey?.minus(1)
         }
     }
@@ -41,7 +39,7 @@ class HomeWallpaperPagingSource constructor(
         return try {
             if (nextPageNumber == 1) {
                 Timber.d("Starting initial retrofit request")
-                getHomeWallpaperDateWithNetworkFlow.value = WallpaperDataNetworkState.Loading
+                networkStateFlow.value = WallpaperDataNetworkState.Loading
             }
             val response = homeScreenWallpaperService.getHomeScreenWallpaper(
                 nextPageNumber,
@@ -52,7 +50,7 @@ class HomeWallpaperPagingSource constructor(
                 order = order
             )
             if (nextPageNumber == 1) {
-                getHomeWallpaperDateWithNetworkFlow.value = WallpaperDataNetworkState.Success
+                networkStateFlow.value = WallpaperDataNetworkState.Success
             }
             Timber.d(response.hits.toString())
             LoadResult.Page(response.hits, null, nextPageNumber + 1)
@@ -61,8 +59,8 @@ class HomeWallpaperPagingSource constructor(
                 return LoadResult.Page(emptyList(), null, null)
             }
             Timber.d(e)
-            if (nextPageNumber == 1 && e is IOException) {
-                getHomeWallpaperDateWithNetworkFlow.value = WallpaperDataNetworkState.Failure
+            if (nextPageNumber == 1) {
+                networkStateFlow.value = WallpaperDataNetworkState.Failure
             }
             LoadResult.Error(e)
         }

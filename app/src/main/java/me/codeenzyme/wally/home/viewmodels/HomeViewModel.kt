@@ -26,41 +26,29 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    // private val pagingSource: HomeWallpaperPagingSource,
     private val homeScreenWallpaperService: HomeScreenWallpaperService,
     private val wallyDownloader: WallyDownloader,
     private val favouritesService: FavouritePhotosRepository
 ): ViewModel() {
 
-    private lateinit var pagingSource: HomeWallpaperPagingSource
-
-    /*val homeWallpaperFlow = Pager(PagingConfig(HOME_WALLPAPER_PAGE_SIZE)) {
-        pagingSource
-    }.flow.cachedIn(viewModelScope)*/
+    private val _wallpaperDataNetworkState = MutableStateFlow<WallpaperDataNetworkState>(WallpaperDataNetworkState.Loading)
 
     fun homeWallpaperFlow(query: String?, safeSearch: Boolean, orientation: String, imageType: String, order: String): Flow<PagingData<Photo>> {
         return Pager(PagingConfig(HOME_WALLPAPER_PAGE_SIZE)) {
-            pagingSource = HomeWallpaperPagingSource(
+            HomeWallpaperPagingSource(
                 homeScreenWallpaperService,
                 safeSearch,
                 orientation,
                 imageType,
                 order,
-                query
+                query,
+                _wallpaperDataNetworkState
             )
-            pagingSource
         }.flow.cachedIn(viewModelScope)
     }
 
-    private val _wallpaperDataNetworkState = MutableStateFlow<WallpaperDataNetworkState>(WallpaperDataNetworkState.Loading)
-    private val wallpaperDataNetworkState: StateFlow<WallpaperDataNetworkState> = _wallpaperDataNetworkState
-
-    suspend fun getWallPaperNetworkState(): StateFlow<WallpaperDataNetworkState> {
-        /*pagingSource.wallpaperDataNetworkLoadingState.collect {
-            Timber.d("viewmodel retrofit state $it")
-            _wallpaperDataNetworkState.value = it
-        }*/
-        return pagingSource.wallpaperDataNetworkLoadingState
+    fun getWallPaperNetworkState(): StateFlow<WallpaperDataNetworkState> {
+        return _wallpaperDataNetworkState
     }
 
     fun startDownload(url: String) = wallyDownloader.startDownload(url)

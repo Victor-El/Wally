@@ -27,7 +27,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.theartofdev.edmodo.cropper.CropImageView
+    <com.canhub.cropper.CropImageView
         android:id="@+id/crop_image_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -40,7 +40,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/close_clickable_image" >
 
-    </com.theartofdev.edmodo.cropper.CropImageView>
+    </com.canhub.cropper.CropImageView>
 
     <ProgressBar
         android:id="@+id/crop_image_progress_bar"

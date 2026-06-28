@@ -41,7 +41,7 @@ import timber.log.Timber
 import java.io.File
 
 @AndroidEntryPoint
-class HomeFragment() : Fragment() {
+class HomeFragment : Fragment() {
 
     private lateinit var homeWallpaperRecyclerAdapter: HomePagedWallpaperAdapter
 

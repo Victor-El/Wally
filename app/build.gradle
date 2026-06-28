@@ -13,7 +13,7 @@ android {
     buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "me.codeenzyme.wally"
+        applicationId "com.turingheights.wally"
         minSdkVersion 24
         targetSdkVersion 33
         versionCode 1

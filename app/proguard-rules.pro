@@ -22,5 +22,5 @@
 
 -keep class androidx.appcompat.widget.** { *; }
 
--keep class me.codeenzyme.wally.commons.models.*
--keep class me.codeenzyme.wally.home.models.*
+-keep class com.turingheights.wally.commons.models.*
+-keep class com.turingheights.wally.home.models.*

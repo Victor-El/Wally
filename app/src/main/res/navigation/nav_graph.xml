@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="me.codeenzyme.wally.home.views.HomeFragment"
+        android:name="com.turingheights.wally.home.views.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -25,19 +25,19 @@
     </fragment>
     <fragment
         android:id="@+id/setCroppedImageFragment"
-        android:name="me.codeenzyme.wally.commons.views.SetCroppedImageFragment"
+        android:name="com.turingheights.wally.commons.views.SetCroppedImageFragment"
         android:label="fragment_set_cropped_image"
         tools:layout="@layout/fragment_set_cropped_image" >
         <argument
             android:name="target"
-            app:argType="me.codeenzyme.wally.commons.views.SetCroppedImageFragment$Data" />
+            app:argType="com.turingheights.wally.commons.views.SetCroppedImageFragment$Data" />
     </fragment>
     <action
         android:id="@+id/action_global_homeFragment"
         app:destination="@id/homeFragment" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="me.codeenzyme.wally.settings.views.SettingsFragment"
+        android:name="com.turingheights.wally.settings.views.SettingsFragment"
         android:label="SettingsFragment" >
         <action
             android:id="@+id/action_settingsFragment_to_orientationDialog"
@@ -51,7 +51,7 @@
     </fragment>
     <dialog
         android:id="@+id/orientationDialog"
-        android:name="me.codeenzyme.wally.settings.views.dialogs.OrientationDialog"
+        android:name="com.turingheights.wally.settings.views.dialogs.OrientationDialog"
         android:label="OrientationDialog" >
         <argument
             android:name="orientation"
@@ -59,7 +59,7 @@
     </dialog>
     <dialog
         android:id="@+id/imageTypeDialog"
-        android:name="me.codeenzyme.wally.settings.views.dialogs.ImageTypeDialog"
+        android:name="com.turingheights.wally.settings.views.dialogs.ImageTypeDialog"
         android:label="ImageTypeDialog" >
         <argument
             android:name="imageType"
@@ -67,7 +67,7 @@
     </dialog>
     <dialog
         android:id="@+id/orderDialog"
-        android:name="me.codeenzyme.wally.settings.views.dialogs.OrderDialog"
+        android:name="com.turingheights.wally.settings.views.dialogs.OrderDialog"
         android:label="OrderDialog" >
         <argument
             android:name="order"
@@ -75,18 +75,18 @@
     </dialog>
     <fragment
         android:id="@+id/fullImageFragment"
-        android:name="me.codeenzyme.wally.commons.views.FullImageFragment"
+        android:name="com.turingheights.wally.commons.views.FullImageFragment"
         android:label="FullImageFragment" >
         <argument
             android:name="photo"
-            app:argType="me.codeenzyme.wally.commons.models.Photo" />
+            app:argType="com.turingheights.wally.commons.models.Photo" />
         <action
             android:id="@+id/action_fullImageFragment_to_setCroppedImageFragment"
             app:destination="@id/setCroppedImageFragment" />
     </fragment>
     <fragment
         android:id="@+id/favouritesFragment"
-        android:name="me.codeenzyme.wally.commons.views.FavouritesFragment"
+        android:name="com.turingheights.wally.commons.views.FavouritesFragment"
         android:label="FavouritesFragment" >
         <action
             android:id="@+id/action_favouritesFragment_to_fullImageFragment"

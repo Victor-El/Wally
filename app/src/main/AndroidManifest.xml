@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="me.codeenzyme.wally">
+    package="com.turingheights.wally">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.SET_WALLPAPER"/>
@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
-        android:name=".WallyApplication"
+        android:name="com.turingheights.wally.WallyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,7 +19,7 @@
         <meta-data android:name="io.sentry.dsn" android:value="https://d5000d6ec231426093d5bc3add7f99ad@o570682.ingest.sentry.io/5717829" />
         <activity android:name="com.canhub.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
-        <activity android:name=".MainActivity"
+        <activity android:name="com.turingheights.wally.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Wally.SplashTheme">
             <intent-filter>

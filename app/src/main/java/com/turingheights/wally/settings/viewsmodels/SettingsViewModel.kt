@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.turingheights.wally.commons.preferencestore.*
-import java.util.*
 
 class SettingsViewModel: ViewModel() {
 
@@ -24,14 +23,14 @@ class SettingsViewModel: ViewModel() {
     }
 
     fun getOrientation(context: Context) = context.settingsPref.data.map {
-        it[ORIENTATION_PREF_KEY]?.toUpperCase(Locale.ROOT) ?: "ALL"
+        it[ORIENTATION_PREF_KEY]?.uppercase() ?: "ALL"
     }
 
     fun getImageType(context: Context) = context.settingsPref.data.map {
-        it[IMAGE_TYPE_PREF_KEY]?.toUpperCase(Locale.ROOT) ?: "ALL"
+        it[IMAGE_TYPE_PREF_KEY]?.uppercase() ?: "ALL"
     }
 
     fun getOrder(context: Context) = context.settingsPref.data.map {
-        it[ORDER_PREF_KEY]?.toUpperCase(Locale.ROOT) ?: "POPULAR"
+        it[ORDER_PREF_KEY]?.uppercase() ?: "POPULAR"
     }
 }

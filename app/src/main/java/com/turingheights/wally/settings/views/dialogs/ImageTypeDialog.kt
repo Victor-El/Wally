@@ -15,7 +15,6 @@ import com.turingheights.wally.R
 import com.turingheights.wally.commons.preferencestore.IMAGE_TYPE_PREF_KEY
 import com.turingheights.wally.commons.preferencestore.settingsPref
 import com.turingheights.wally.databinding.FragmentDialogImageTypeBinding
-import java.util.*
 
 class ImageTypeDialog : DialogFragment() {
 
@@ -29,10 +28,10 @@ class ImageTypeDialog : DialogFragment() {
 
         viewBinding.imageTypeRadioGroup.setOnCheckedChangeListener { radioGroup: RadioGroup, i: Int ->
             imageType = viewBinding.root.findViewById<RadioButton>(i).text.toString()
-                .toLowerCase(Locale.ROOT)
+                .lowercase()
         }
 
-        when (arg.imageType.toLowerCase(Locale.ROOT)) {
+        when (arg.imageType.lowercase()) {
             "all" -> {
                 viewBinding.imageTypeAll.isChecked = true
             }

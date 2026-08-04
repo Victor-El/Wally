@@ -15,7 +15,6 @@ import com.turingheights.wally.R
 import com.turingheights.wally.commons.preferencestore.ORDER_PREF_KEY
 import com.turingheights.wally.commons.preferencestore.settingsPref
 import com.turingheights.wally.databinding.FragmentDialogOrderBinding
-import java.util.*
 
 class OrderDialog : DialogFragment() {
 
@@ -26,10 +25,10 @@ class OrderDialog : DialogFragment() {
         var order = ""
         viewBinding.orientationRadioGroup.setOnCheckedChangeListener { radioGroup: RadioGroup, i: Int ->
             order = viewBinding.root.findViewById<RadioButton>(i).text.toString()
-                .toLowerCase(Locale.ROOT)
+                .lowercase()
         }
 
-        when (arg.order.toLowerCase(Locale.ROOT)) {
+        when (arg.order.lowercase()) {
             "popular" -> {
                 viewBinding.orderPopular.isChecked = true
             }

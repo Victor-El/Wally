@@ -15,7 +15,6 @@ import com.turingheights.wally.R
 import com.turingheights.wally.commons.preferencestore.ORIENTATION_PREF_KEY
 import com.turingheights.wally.commons.preferencestore.settingsPref
 import com.turingheights.wally.databinding.FragmentDialogOrientationBinding
-import java.util.*
 
 class OrientationDialog : DialogFragment() {
 
@@ -26,10 +25,10 @@ class OrientationDialog : DialogFragment() {
         var orientation = ""
         viewBinding.orientationRadioGroup.setOnCheckedChangeListener { radioGroup: RadioGroup, i: Int ->
             orientation = viewBinding.root.findViewById<RadioButton>(i).text.toString()
-                .toLowerCase(Locale.ROOT)
+                .lowercase()
         }
 
-        when (arg.orientation.toLowerCase(Locale.ROOT)) {
+        when (arg.orientation.lowercase()) {
             "all" -> {
                 viewBinding.orientationAll.isChecked = true
             }

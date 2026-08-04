@@ -7,7 +7,10 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -51,6 +54,14 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewBinding = FragmentHomeBinding.bind(view)
+        
+        ViewCompat.setOnApplyWindowInsetsListener(viewBinding.mainConstraintLayout) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top)
+            viewBinding.homeWallpaperRecyclerView.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+
         viewBinding.run {
 
             actionFavourite.setOnClickListener {

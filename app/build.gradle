@@ -14,6 +14,7 @@ android {
 
     defaultConfig {
         applicationId "com.turingheights.wally"
+        manifestPlaceholders = [appName: "Wally"]
         minSdkVersion 24
         targetSdkVersion 36
         versionCode 3
@@ -36,6 +37,9 @@ android {
         debug {
             buildConfigField("String", "BASE_API_URL", wallyProperties["DEV_API_BASE_URL"])
             buildConfigField("String", "API_KEY", wallyProperties["API_KEY"])
+
+            applicationIdSuffix ".debug"
+            manifestPlaceholders = [appName: "Wally (Debug)"]
         }
 
         release {

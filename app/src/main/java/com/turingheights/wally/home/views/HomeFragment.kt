@@ -42,6 +42,10 @@ class HomeFragment : Fragment() {
     private val homeViewModel by viewModels<HomeViewModel>()
     private lateinit var viewBinding: FragmentHomeBinding
 
+    private var currentOrder = POPULAR
+    private var currentCategory: String? = null
+    private var currentQuery: String? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -171,6 +175,26 @@ class HomeFragment : Fragment() {
             homeWallpaperRecyclerView.layoutManager =
                 StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             homeWallpaperRecyclerView.adapter = concatAdapter
+
+            primaryFilterGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+                if (checkedIds.isNotEmpty()) {
+                    currentOrder = when (checkedIds.first()) {
+                        R.id.chip_latest -> "latest"
+                        else -> POPULAR
+                    }
+                    refreshData()
+                }
+            }
+
+            categoryFilterGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+                currentCategory = if (checkedIds.isNotEmpty()) {
+                    val chip = group.findViewById<com.google.android.material.chip.Chip>(checkedIds.first())
+                    chip.text.toString()
+                } else {
+                    null
+                }
+                refreshData()
+            }
         }
 
         selectWallpaperTargetDialog = SelectWallpaperTargetDialog()
@@ -180,34 +204,40 @@ class HomeFragment : Fragment() {
                 val safeSearch = it[SAFE_SEARCH_PREF_KEY] ?: true
                 val orientation = it[ORIENTATION_PREF_KEY] ?: ALL
                 val imageType = it[IMAGE_TYPE_PREF_KEY] ?: ALL
-                val order = it[ORDER_PREF_KEY] ?: POPULAR
+                
+                // If the preference order changes, we might want to update currentOrder
+                // but usually the chips should drive the session.
+                // For now, let's just use the chips' values or initial preference.
 
-                loadData(null, safeSearch, orientation, imageType, order)
+                loadData(currentQuery, currentCategory, safeSearch, orientation, imageType, currentOrder)
                 startObservingNetworkState()
             }
         }
 
         viewBinding.actionSearchView.setOnEditorActionListener { tv: TextView, aID: Int, _ ->
-            var handled = false
             if (aID == EditorInfo.IME_ACTION_SEARCH) {
-                viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-                    requireContext().settingsPref.data.collect {
-                        val safeSearch = it[SAFE_SEARCH_PREF_KEY] ?: true
-                        val orientation = it[ORIENTATION_PREF_KEY] ?: ALL
-                        val imageType = it[IMAGE_TYPE_PREF_KEY] ?: ALL
-                        val order = it[ORDER_PREF_KEY] ?: POPULAR
-
-                        loadData(viewBinding.actionSearchView.text.toString(), safeSearch, orientation, imageType, order)
-                        startObservingNetworkState()
-                    }
-                }
-                handled = true
+                currentQuery = viewBinding.actionSearchView.text.toString()
+                refreshData()
+                true
+            } else {
+                false
             }
-            handled
         }
 
         viewBinding.actionSettings.setOnClickListener {
             findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToSettingsFragment())
+        }
+    }
+
+    private fun refreshData() {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            requireContext().settingsPref.data.collect {
+                val safeSearch = it[SAFE_SEARCH_PREF_KEY] ?: true
+                val orientation = it[ORIENTATION_PREF_KEY] ?: ALL
+                val imageType = it[IMAGE_TYPE_PREF_KEY] ?: ALL
+                
+                loadData(currentQuery, currentCategory, safeSearch, orientation, imageType, currentOrder)
+            }
         }
     }
 
@@ -237,9 +267,9 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun loadData(query: String?, safeSearch: Boolean, orientation: String, imageType: String, order: String) {
+    private fun loadData(query: String?, category: String?, safeSearch: Boolean, orientation: String, imageType: String, order: String) {
         viewLifecycleOwner.lifecycleScope.launch {
-            homeViewModel.homeWallpaperFlow(query, safeSearch, orientation, imageType, order).collectLatest {
+            homeViewModel.homeWallpaperFlow(query, category, safeSearch, orientation, imageType, order).collectLatest {
                 homeWallpaperRecyclerAdapter.submitData(it)
             }
         }

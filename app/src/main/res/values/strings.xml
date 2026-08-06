@@ -2,7 +2,7 @@
     <string name="app_name">Wally</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="search_wallpapers">Search Wally…</string>
+    <string name="search_wallpapers">Search wallpapers…</string>
     <string name="favourite">Add to favourites</string>
     <string name="set_as_wallpaper">Set as wallpaper</string>
     <string name="download">Download</string>
@@ -36,4 +36,26 @@
     <string name="image_type">Image type</string>
     <string name="order">Order</string>
     <string name="favourites">Favourites</string>
+    <string name="trending">Trending</string>
+    <string name="latest">Latest</string>
+    <string name="backgrounds">backgrounds</string>
+    <string name="fashion">fashion</string>
+    <string name="nature">nature</string>
+    <string name="science">science</string>
+    <string name="education">education</string>
+    <string name="feelings">feelings</string>
+    <string name="health">health</string>
+    <string name="people">people</string>
+    <string name="religion">religion</string>
+    <string name="places">places</string>
+    <string name="animals">animals</string>
+    <string name="industry">industry</string>
+    <string name="computer">computer</string>
+    <string name="food">food</string>
+    <string name="sports">sports</string>
+    <string name="transportation">transportation</string>
+    <string name="travel">travel</string>
+    <string name="buildings">buildings</string>
+    <string name="business">business</string>
+    <string name="music">music</string>
 </resources>

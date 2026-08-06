@@ -14,6 +14,7 @@ interface HomeScreenWallpaperService {
         @Query("page") page: Int,
         @Query("key") apiKey: String = API_KEY,
         @Query("q") query: String? = null,
+        @Query("category") category: String? = null,
         @Query("safesearch") safeSearch: Boolean = false,
         @Query("orientation") orientation: String = ALL,
         @Query("order") order: String = POPULAR,

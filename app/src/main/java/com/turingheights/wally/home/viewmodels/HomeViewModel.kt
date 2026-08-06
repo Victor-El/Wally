@@ -29,7 +29,7 @@ class HomeViewModel @Inject constructor(
 
     private val _wallpaperDataNetworkState = MutableStateFlow<WallpaperDataNetworkState>(WallpaperDataNetworkState.Loading)
 
-    fun homeWallpaperFlow(query: String?, safeSearch: Boolean, orientation: String, imageType: String, order: String): Flow<PagingData<Photo>> {
+    fun homeWallpaperFlow(query: String?, category: String?, safeSearch: Boolean, orientation: String, imageType: String, order: String): Flow<PagingData<Photo>> {
         return Pager(PagingConfig(HOME_WALLPAPER_PAGE_SIZE)) {
             HomeWallpaperPagingSource(
                 homeScreenWallpaperService,
@@ -37,6 +37,7 @@ class HomeViewModel @Inject constructor(
                 orientation,
                 imageType,
                 order,
+                category,
                 query,
                 _wallpaperDataNetworkState
             )

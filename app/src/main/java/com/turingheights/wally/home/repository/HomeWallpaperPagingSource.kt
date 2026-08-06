@@ -15,6 +15,7 @@ class HomeWallpaperPagingSource constructor(
     private val orientation: String,
     private val imageType: String,
     private val order: String,
+    private val category: String? = null,
     private val searchTerm: String? = null,
     private val networkStateFlow: MutableStateFlow<WallpaperDataNetworkState>
 ): PagingSource<Int, Photo>(){
@@ -36,6 +37,7 @@ class HomeWallpaperPagingSource constructor(
             val response = homeScreenWallpaperService.getHomeScreenWallpaper(
                 nextPageNumber,
                 query = searchTerm,
+                category = category,
                 safeSearch = safeSearch,
                 orientation = orientation,
                 imagetype = imageType,

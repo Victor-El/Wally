@@ -4,10 +4,11 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -42,15 +43,20 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
 
         viewBinding = FragmentFullImageBinding.bind(view)
 
-        viewBinding?.let {
+        viewBinding?.let { binding ->
 
-            ViewCompat.setOnApplyWindowInsetsListener(it.root) { v, windowInsets ->
+            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-                v.updatePadding(top = insets.top, bottom = insets.bottom)
+                binding.closeClickableImage.updateLayoutParams<MarginLayoutParams> {
+                    topMargin = insets.top + 16.dpToPx()
+                }
+                binding.actionsContainer.updateLayoutParams<MarginLayoutParams> {
+                    bottomMargin = insets.bottom + 32.dpToPx()
+                }
                 windowInsets
             }
 
-            it.closeClickableImage.setOnClickListener {
+            binding.closeClickableImage.setOnClickListener {
                 findNavController().navigateUp()
             }
 
@@ -61,16 +67,16 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
                         transition: Transition<in Bitmap>?
                     ) {
 
-                        it.photoView.setImageBitmap(resource)
-                        it.cropImageProgressBar.isVisible = false
+                        binding.photoView.setImageBitmap(resource)
+                        binding.cropImageProgressBar.isVisible = false
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
-                        it.cropImageProgressBar.isVisible = false
+                        binding.cropImageProgressBar.isVisible = false
                     }
                 })
 
-            it.setWallpaper.setOnClickListener {
+            binding.setWallpaper.setOnClickListener {
                 selectWallpaperTargetDialog.bindListener(object :
                     SelectWallpaperTargetDialog.SelectTargetListener {
                     override fun onHomeSelected() {
@@ -113,7 +119,7 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
             }
 
 
-            it.favouriteWallpaper.setOnClickListener {
+            binding.favouriteWallpaper.setOnClickListener {
                 viewModel.addToFavourites(arg.photo)
                 Snackbar.make(
                     viewBinding!!.root,
@@ -123,7 +129,7 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
             }
 
 
-            it.downloadWallpaper.setOnClickListener {
+            binding.downloadWallpaper.setOnClickListener {
                 viewModel.startDownload(arg.photo.largeImageURL)
                 Snackbar.make(
                     viewBinding!!.root,
@@ -132,6 +138,10 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
                 ).show()
             }
         }
+    }
+
+    private fun Int.dpToPx(): Int {
+        return (this * resources.displayMetrics.density).toInt()
     }
 
     override fun onDestroyView() {

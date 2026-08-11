@@ -36,14 +36,15 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/favourites_recycler_view"
         android:layout_width="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:paddingHorizontal="4dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/favourites_title"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/favourites_title" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -68,8 +69,8 @@
         tools:visibility="visible">
 
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:src="@drawable/ic_round_favorite_border_24"
             app:tint="@color/settings_card_background" />
 
@@ -79,8 +80,16 @@
             android:layout_marginTop="16dp"
             android:text="@string/no_favourites_found"
             android:textColor="@android:color/darker_gray"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/no_favourites_description"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp" />
 
     </LinearLayout>
 

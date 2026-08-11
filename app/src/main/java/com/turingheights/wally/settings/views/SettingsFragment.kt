@@ -37,10 +37,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 findNavController().navigateUp()
             }
 
-            safeSearchSwitch.setOnCheckedChangeListener { _, isChecked ->
-                settingsViewModel.setSafeSearch(requireContext(), isChecked)
-            }
-
             orientationCard.setOnClickListener {
                 findNavController().navigate(SettingsFragmentDirections.actionSettingsFragmentToOrientationDialog(orientation))
             }
@@ -77,13 +73,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             settingsViewModel.getOrder(requireContext()).collect {
                 order = it
                 viewBinding.popularState.text = it
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-            settingsViewModel.getSafeSearch(requireContext()).collect {
-                viewBinding.safeSearchSwitch.isChecked = it
-                if (it) viewBinding.safeSearchState.text = "ON" else viewBinding.safeSearchState.text = "OFF"
             }
         }
     }

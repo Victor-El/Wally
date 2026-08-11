@@ -15,6 +15,7 @@
     <string name="error_loading_wallpapers">Error loading wallpapers</string>
     <string name="no_wallpaper_found">No wallpaper found</string>
     <string name="no_favourites_found">No favourites found</string>
+    <string name="no_favourites_description">Saved wallpapers will appear here</string>
     <string name="downloading_wallpaer">Downloading new wallpaper</string>
     <string name="download_in_progress">Download in progress</string>
     <!-- Preference Titles -->
@@ -36,6 +37,11 @@
     <string name="orientation">Orientation</string>
     <string name="image_type">Image type</string>
     <string name="order">Order</string>
+    <string name="orientation_summary">Landscape or portrait images</string>
+    <string name="image_type_summary">Category of images to load</string>
+    <string name="order_summary">Sort by popularity or latest</string>
+    <string name="all_caps">ALL</string>
+    <string name="popular_caps">POPULAR</string>
     <string name="favourites">Favourites</string>
     <string name="trending">Trending</string>
     <string name="latest">Latest</string>

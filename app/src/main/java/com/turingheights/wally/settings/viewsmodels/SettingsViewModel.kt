@@ -10,18 +10,6 @@ import com.turingheights.wally.commons.preferencestore.*
 
 class SettingsViewModel: ViewModel() {
 
-    fun getSafeSearch(context: Context) = context.settingsPref.data.map {
-        it[SAFE_SEARCH_PREF_KEY] ?: false
-    }
-
-    fun setSafeSearch(context: Context, boolean: Boolean) {
-        viewModelScope.launch {
-            context.settingsPref.edit {
-                it[SAFE_SEARCH_PREF_KEY] = boolean
-            }
-        }
-    }
-
     fun getOrientation(context: Context) = context.settingsPref.data.map {
         it[ORIENTATION_PREF_KEY]?.uppercase() ?: "ALL"
     }

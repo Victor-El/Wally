@@ -19,4 +19,7 @@ class DataModule {
         return PhotoDatabase.getInstance(context)
     }
 
+    @Provides
+    fun providesCachedPhotoDao(database: PhotoDatabase) = database.cachedPhotoDao()
+
 }

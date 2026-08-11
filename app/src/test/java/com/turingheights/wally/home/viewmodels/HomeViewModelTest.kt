@@ -1,6 +1,7 @@
 package com.turingheights.wally.home.viewmodels
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.turingheights.wally.commons.data.local.daos.CachedPhotoDao
 import com.turingheights.wally.commons.repositories.FavouritePhotosRepository
 import com.turingheights.wally.commons.utils.WallyDownloader
 import com.turingheights.wally.home.data.remote.HomeScreenWallpaperService
@@ -25,6 +26,7 @@ class HomeViewModelTest {
     private val service: HomeScreenWallpaperService = mockk(relaxed = true)
     private val downloader: WallyDownloader = mockk(relaxed = true)
     private val repository: FavouritePhotosRepository = mockk(relaxed = true)
+    private val cachedPhotoDao: CachedPhotoDao = mockk(relaxed = true)
     
     private lateinit var viewModel: HomeViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -32,7 +34,7 @@ class HomeViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = HomeViewModel(service, downloader, repository)
+        viewModel = HomeViewModel(service, downloader, repository, cachedPhotoDao)
     }
 
     @After
@@ -50,7 +52,6 @@ class HomeViewModelTest {
     @Test
     fun `updateSearchParams updates state`() {
         viewModel.updateSearchParams(query = "nature")
-        // Verify no crash and params updated (params is private, so we observe side effects if any)
-        // In this case, we can check if it triggers a new flow but that's complex with Paging.
+        // Verify no crash and params updated
     }
 }

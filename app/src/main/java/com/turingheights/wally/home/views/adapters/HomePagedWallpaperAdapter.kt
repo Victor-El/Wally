@@ -41,7 +41,7 @@ class HomePagedWallpaperAdapter(private val actionMoreListener: (Photo, Int, Vie
                 .load(photo.webformatURL)
                 .thumbnail(Glide.with(viewBinding.root.context).load(photo.previewURL))
                 .centerCrop()
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(

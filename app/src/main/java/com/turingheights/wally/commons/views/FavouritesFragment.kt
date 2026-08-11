@@ -113,7 +113,7 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
                         Glide.with(viewBinding.root.context)
                             .load(photo.webformatURL)
                             .thumbnail(Glide.with(viewBinding.root.context).load(photo.previewURL))
-                            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .listener(object : RequestListener<Drawable> {
                                 override fun onLoadFailed(

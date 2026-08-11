@@ -7,11 +7,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.turingheights.wally.R
 import com.turingheights.wally.databinding.FragmentSettingsBinding
 import com.turingheights.wally.settings.viewsmodels.SettingsViewModel
+import kotlinx.coroutines.launch
 
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
@@ -54,25 +57,30 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
 
-        viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-            settingsViewModel.getOrientation(requireContext()).collect {
-                orientation = it
-                viewBinding.orientationState.text = it
-            }
-
-        }
-
-        viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-            settingsViewModel.getImageType(requireContext()).collect {
-                imageType = it
-                viewBinding.imageTypeState.text = it
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                settingsViewModel.getOrientation(requireContext()).collect {
+                    orientation = it
+                    viewBinding.orientationState.text = it
+                }
             }
         }
 
-        viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-            settingsViewModel.getOrder(requireContext()).collect {
-                order = it
-                viewBinding.popularState.text = it
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                settingsViewModel.getImageType(requireContext()).collect {
+                    imageType = it
+                    viewBinding.imageTypeState.text = it
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                settingsViewModel.getOrder(requireContext()).collect {
+                    order = it
+                    viewBinding.popularState.text = it
+                }
             }
         }
     }

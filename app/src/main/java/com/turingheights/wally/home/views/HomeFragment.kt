@@ -246,25 +246,27 @@ class HomeFragment : Fragment() {
     }
 
     private fun startObservingNetworkState() {
-        viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-            homeViewModel.getWallPaperNetworkState().collect {
-                when (it) {
-                    is WallpaperDataNetworkState.Loading -> viewBinding.homeProgressBar.isVisible =
-                        true
-                    WallpaperDataNetworkState.Success -> {
-                        if (viewBinding.homeSwipeRefreshLayout.isRefreshing) {
-                            viewBinding.homeSwipeRefreshLayout.isRefreshing = false
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                homeViewModel.getWallPaperNetworkState().collect {
+                    when (it) {
+                        is WallpaperDataNetworkState.Loading -> viewBinding.homeProgressBar.isVisible =
+                            true
+                        WallpaperDataNetworkState.Success -> {
+                            if (viewBinding.homeSwipeRefreshLayout.isRefreshing) {
+                                viewBinding.homeSwipeRefreshLayout.isRefreshing = false
+                            }
+                            viewBinding.homeProgressBar.isVisible = false
+                            viewBinding.homeSwipeRefreshLayout.isEnabled = false
                         }
-                        viewBinding.homeProgressBar.isVisible = false
-                        viewBinding.homeSwipeRefreshLayout.isEnabled = false
-                    }
-                    WallpaperDataNetworkState.Failure -> {
-                        if (viewBinding.homeSwipeRefreshLayout.isRefreshing) {
-                            viewBinding.homeSwipeRefreshLayout.isRefreshing = false
+                        WallpaperDataNetworkState.Failure -> {
+                            if (viewBinding.homeSwipeRefreshLayout.isRefreshing) {
+                                viewBinding.homeSwipeRefreshLayout.isRefreshing = false
+                            }
+                            viewBinding.homeProgressBar.isVisible = false
+                            viewBinding.networkErrorView.isVisible = true
+                            viewBinding.homeSwipeRefreshLayout.isEnabled = true
                         }
-                        viewBinding.homeProgressBar.isVisible = false
-                        viewBinding.networkErrorView.isVisible = true
-                        viewBinding.homeSwipeRefreshLayout.isEnabled = true
                     }
                 }
             }

@@ -1,60 +1,62 @@
 package com.turingheights.wally.settings.views.dialogs
 
-import android.app.AlertDialog
-import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import androidx.datastore.preferences.core.edit
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 import com.turingheights.wally.R
 import com.turingheights.wally.commons.preferencestore.ORIENTATION_PREF_KEY
 import com.turingheights.wally.commons.preferencestore.settingsPref
 import com.turingheights.wally.databinding.FragmentDialogOrientationBinding
 
-class OrientationDialog : DialogFragment() {
+class OrientationDialog : BottomSheetDialogFragment() {
 
     private val arg by navArgs<OrientationDialogArgs>()
+    private lateinit var viewBinding: FragmentDialogOrientationBinding
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val viewBinding = FragmentDialogOrientationBinding.inflate(layoutInflater)
-        var orientation = ""
-        viewBinding.orientationRadioGroup.setOnCheckedChangeListener { radioGroup: RadioGroup, i: Int ->
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        viewBinding = FragmentDialogOrientationBinding.inflate(inflater, container, false)
+        return viewBinding.root
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.Theme_Wally_BottomSheetDialog)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        var orientation = arg.orientation.lowercase()
+
+        viewBinding.orientationRadioGroup.setOnCheckedChangeListener { _, i ->
             orientation = viewBinding.root.findViewById<RadioButton>(i).text.toString()
                 .lowercase()
         }
 
         when (arg.orientation.lowercase()) {
-            "all" -> {
-                viewBinding.orientationAll.isChecked = true
-            }
-            "horizontal" -> {
-                viewBinding.orientationLandscape.isChecked = true
-            }
-            "vertical" -> {
-                viewBinding.orientationPortrait.isChecked = true
-            }
+            "all" -> viewBinding.orientationAll.isChecked = true
+            "horizontal" -> viewBinding.orientationLandscape.isChecked = true
+            "vertical" -> viewBinding.orientationPortrait.isChecked = true
         }
 
-        val dialog = AlertDialog.Builder(context)
-            .setTitle(R.string.orientation)
-            .setView(viewBinding.root)
-            .setPositiveButton("OK") { dialogInterface: DialogInterface, i: Int ->
-                if (orientation.trim().isNotEmpty()) {
-                    lifecycleScope.launch {
-                        requireContext().settingsPref.edit {
-                            it[ORIENTATION_PREF_KEY] = orientation
-                        }
-                        dialogInterface.dismiss()
-                    }
+        viewBinding.btnOk.setOnClickListener {
+            lifecycleScope.launch {
+                requireContext().settingsPref.edit {
+                    it[ORIENTATION_PREF_KEY] = orientation
                 }
+                dismiss()
             }
-            .create()
-        // dialog.window?.setBackgroundDrawableResource(android.R.color.background_dark)
-        return dialog
+        }
     }
 }

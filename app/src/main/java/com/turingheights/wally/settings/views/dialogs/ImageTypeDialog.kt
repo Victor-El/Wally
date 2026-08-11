@@ -1,66 +1,63 @@
 package com.turingheights.wally.settings.views.dialogs
 
-import android.app.AlertDialog
-import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import androidx.datastore.preferences.core.edit
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 import com.turingheights.wally.R
 import com.turingheights.wally.commons.preferencestore.IMAGE_TYPE_PREF_KEY
 import com.turingheights.wally.commons.preferencestore.settingsPref
 import com.turingheights.wally.databinding.FragmentDialogImageTypeBinding
 
-class ImageTypeDialog : DialogFragment() {
+class ImageTypeDialog : BottomSheetDialogFragment() {
 
     private lateinit var viewBinding: FragmentDialogImageTypeBinding
-
     private val arg by navArgs<ImageTypeDialogArgs>()
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        viewBinding = FragmentDialogImageTypeBinding.inflate(layoutInflater)
-        var imageType = ""
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        viewBinding = FragmentDialogImageTypeBinding.inflate(inflater, container, false)
+        return viewBinding.root
+    }
 
-        viewBinding.imageTypeRadioGroup.setOnCheckedChangeListener { radioGroup: RadioGroup, i: Int ->
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.Theme_Wally_BottomSheetDialog)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        var imageType = arg.imageType.lowercase()
+
+        viewBinding.imageTypeRadioGroup.setOnCheckedChangeListener { _, i ->
             imageType = viewBinding.root.findViewById<RadioButton>(i).text.toString()
                 .lowercase()
         }
 
         when (arg.imageType.lowercase()) {
-            "all" -> {
-                viewBinding.imageTypeAll.isChecked = true
-            }
-            "photo" -> {
-                viewBinding.imageTypePhoto.isChecked = true
-            }
-            "illustration" -> {
-                viewBinding.imageTypeIllustration.isChecked = true
-            }
-            "vector" -> {
-                viewBinding.imageTypeVector.isChecked = true
-            }
+            "all" -> viewBinding.imageTypeAll.isChecked = true
+            "photo" -> viewBinding.imageTypePhoto.isChecked = true
+            "illustration" -> viewBinding.imageTypeIllustration.isChecked = true
+            "vector" -> viewBinding.imageTypeVector.isChecked = true
         }
 
-        val dialog = AlertDialog.Builder(context)
-            .setTitle(getString(R.string.image_type))
-            .setView(viewBinding.root)
-            .setPositiveButton("OK") { dialogInterface: DialogInterface, i: Int ->
-                if (imageType.trim().isNotEmpty()) {
-                    lifecycleScope.launch {
-                        requireContext().settingsPref.edit {
-                            it[IMAGE_TYPE_PREF_KEY] = imageType
-                        }
-                        dialogInterface.dismiss()
-                    }
+        viewBinding.btnOk.setOnClickListener {
+            lifecycleScope.launch {
+                requireContext().settingsPref.edit {
+                    it[IMAGE_TYPE_PREF_KEY] = imageType
                 }
+                dismiss()
             }
-            .create()
-        // dialog.window?.setBackgroundDrawableResource(android.R.color.background_dark)
-        return dialog
+        }
     }
 }

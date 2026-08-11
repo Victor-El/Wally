@@ -15,6 +15,14 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="Theme.Wally.BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Theme.Wally.BottomSheetStyle</item>
+    </style>
+
+    <style name="Theme.Wally.BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
     <style name="Theme.Wally.SplashTheme" parent="Theme.Wally">
         <item name="android:windowBackground">@drawable/launch_background</item>
     </style>

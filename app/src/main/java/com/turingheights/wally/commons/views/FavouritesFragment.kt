@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -42,6 +45,12 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
         super.onViewCreated(view, savedInstanceState)
 
         viewBinding = FragmentFavouritesBinding.bind(view)
+
+        ViewCompat.setOnApplyWindowInsetsListener(viewBinding!!.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top, bottom = insets.bottom)
+            windowInsets
+        }
 
         adapter = FavouritesAdapter ({
             findNavController().navigate(

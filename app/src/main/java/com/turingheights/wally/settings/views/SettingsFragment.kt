@@ -2,6 +2,9 @@ package com.turingheights.wally.settings.views
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +24,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val viewBinding = FragmentSettingsBinding.bind(view)
+
+        ViewCompat.setOnApplyWindowInsetsListener(viewBinding.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top, bottom = insets.bottom)
+            windowInsets
+        }
 
         viewBinding.run {
 

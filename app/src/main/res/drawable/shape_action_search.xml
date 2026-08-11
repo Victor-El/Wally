@@ -3,8 +3,4 @@
 
     <solid android:color="#161616"/>
     <corners android:radius="100dp"/>
-    <stroke
-        android:color="#33FAF9F9"
-        android:width="0.5dp" />
-
 </shape>

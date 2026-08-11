@@ -111,7 +111,9 @@
                     android:textColor="@color/chip_text_selector"
                     app:checkedIconVisible="false"
                     app:chipBackgroundColor="@color/chip_background_selector"
-                    app:chipIconVisible="false" />
+                    app:chipIcon="@drawable/outline_trending_up_24"
+                    app:chipIconTint="@color/chip_text_selector"
+                    app:chipIconVisible="true" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_latest"
@@ -122,7 +124,9 @@
                     android:textColor="@color/chip_text_selector"
                     app:checkedIconVisible="false"
                     app:chipBackgroundColor="@color/chip_background_selector"
-                    app:chipIconVisible="false" />
+                    app:chipIcon="@drawable/outline_clock_loader_40_24"
+                    app:chipIconTint="@color/chip_text_selector"
+                    app:chipIconVisible="true" />
 
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>
@@ -418,6 +422,7 @@
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

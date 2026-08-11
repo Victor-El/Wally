@@ -13,9 +13,12 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,15 +39,12 @@ import com.turingheights.wally.home.views.adapters.HomePagedWallpaperAdapter
 class HomeFragment : Fragment() {
 
     private lateinit var homeWallpaperRecyclerAdapter: HomePagedWallpaperAdapter
+    private lateinit var concatAdapter: RecyclerView.Adapter<*>
 
     private lateinit var selectWallpaperTargetDialog: SelectWallpaperTargetDialog
 
     private val homeViewModel by viewModels<HomeViewModel>()
     private lateinit var viewBinding: FragmentHomeBinding
-
-    private var currentOrder = POPULAR
-    private var currentCategory: String? = null
-    private var currentQuery: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,143 +81,159 @@ class HomeFragment : Fragment() {
             )
             homeSwipeRefreshLayout.setOnRefreshListener {
                 viewBinding.networkErrorView.isVisible = false
-                // viewBinding.homeProgressBar.isVisible = true
-                //startObservingNetworkState()
-                //loadData()
-                // TODO: Handle refresh while no network error
                 homeWallpaperRecyclerAdapter.retry()
                 homeSwipeRefreshLayout.isEnabled = false
             }
-            homeWallpaperRecyclerAdapter = HomePagedWallpaperAdapter ({ photo, _, view ->
-                val popupMenu = PopupMenu(requireContext(), view).also {
-                    it.inflate(R.menu.menu_home_wallpaper)
-                    it.setOnMenuItemClickListener { menuItem ->
-                        when (menuItem.itemId) {
-                            R.id.action_home_popup_download -> {
-                                homeViewModel.startDownload(photo.largeImageURL)
-                                Snackbar.make(
-                                    viewBinding.root,
-                                    "Downloading...",
-                                    Snackbar.LENGTH_LONG
-                                ).show()
-                            }
 
-                            R.id.action_home_popup_favourite -> {
-                                homeViewModel.addToFavourites(photo)
-                                Snackbar.make(
-                                    viewBinding.root,
-                                    "Added to favorite",
-                                    Snackbar.LENGTH_LONG
-                                ).show()
-                            }
+            if (!::homeWallpaperRecyclerAdapter.isInitialized) {
+                homeWallpaperRecyclerAdapter = HomePagedWallpaperAdapter({ photo, _, view ->
+                    val popupMenu = PopupMenu(requireContext(), view).also {
+                        it.inflate(R.menu.menu_home_wallpaper)
+                        it.setOnMenuItemClickListener { menuItem ->
+                            when (menuItem.itemId) {
+                                R.id.action_home_popup_download -> {
+                                    homeViewModel.startDownload(photo.largeImageURL)
+                                    Snackbar.make(
+                                        view,
+                                        "Downloading...",
+                                        Snackbar.LENGTH_LONG
+                                    ).show()
+                                }
 
-                            R.id.action_home_popup_set_wallpaper -> {
-                                selectWallpaperTargetDialog.bindListener(object :
-                                    SelectWallpaperTargetDialog.SelectTargetListener {
-                                    override fun onHomeSelected() {
-                                        findNavController().navigate(
-                                            HomeFragmentDirections.actionHomeFragmentToSetCroppedImageFragment(
-                                                SetCroppedImageFragment.Data(
-                                                    SetCroppedImageFragment.WallpaperTarget.HOME,
-                                                    photo.largeImageURL
+                                R.id.action_home_popup_favourite -> {
+                                    homeViewModel.addToFavourites(photo)
+                                    Snackbar.make(
+                                        view,
+                                        "Added to favorite",
+                                        Snackbar.LENGTH_LONG
+                                    ).show()
+                                }
+
+                                R.id.action_home_popup_set_wallpaper -> {
+                                    selectWallpaperTargetDialog.bindListener(object :
+                                        SelectWallpaperTargetDialog.SelectTargetListener {
+                                        override fun onHomeSelected() {
+                                            findNavController().navigate(
+                                                HomeFragmentDirections.actionHomeFragmentToSetCroppedImageFragment(
+                                                    SetCroppedImageFragment.Data(
+                                                        SetCroppedImageFragment.WallpaperTarget.HOME,
+                                                        photo.largeImageURL
+                                                    )
                                                 )
                                             )
-                                        )
-                                    }
+                                        }
 
-                                    override fun onLockSelected() {
-                                        findNavController().navigate(
-                                            HomeFragmentDirections.actionHomeFragmentToSetCroppedImageFragment(
-                                                SetCroppedImageFragment.Data(
-                                                    SetCroppedImageFragment.WallpaperTarget.LOCK,
-                                                    photo.largeImageURL
+                                        override fun onLockSelected() {
+                                            findNavController().navigate(
+                                                HomeFragmentDirections.actionHomeFragmentToSetCroppedImageFragment(
+                                                    SetCroppedImageFragment.Data(
+                                                        SetCroppedImageFragment.WallpaperTarget.LOCK,
+                                                        photo.largeImageURL
+                                                    )
                                                 )
                                             )
-                                        )
-                                    }
+                                        }
 
-                                    override fun onBothSelected() {
-                                        findNavController().navigate(
-                                            HomeFragmentDirections.actionHomeFragmentToSetCroppedImageFragment(
-                                                SetCroppedImageFragment.Data(
-                                                    SetCroppedImageFragment.WallpaperTarget.BOTH,
-                                                    photo.largeImageURL
+                                        override fun onBothSelected() {
+                                            findNavController().navigate(
+                                                HomeFragmentDirections.actionHomeFragmentToSetCroppedImageFragment(
+                                                    SetCroppedImageFragment.Data(
+                                                        SetCroppedImageFragment.WallpaperTarget.BOTH,
+                                                        photo.largeImageURL
+                                                    )
                                                 )
                                             )
-                                        )
-                                    }
-                                })
-                                selectWallpaperTargetDialog.show(
-                                    requireActivity().supportFragmentManager,
-                                    "selectDialog"
-                                )
+                                        }
+                                    })
+                                    selectWallpaperTargetDialog.show(
+                                        requireActivity().supportFragmentManager,
+                                        "selectDialog"
+                                    )
+                                }
                             }
+                            true
                         }
-                        true
                     }
+                    popupMenu.show()
+                }) {
+                    findNavController().navigate(
+                        HomeFragmentDirections.actionHomeFragmentToFullImageFragment(it)
+                    )
                 }
-                popupMenu.show()
-            }) {
-                findNavController().navigate(
-                    HomeFragmentDirections.actionHomeFragmentToFullImageFragment(it)
-                )
-            }
-            homeWallpaperRecyclerAdapter.addLoadStateListener {
-                if (viewBinding.homeSwipeRefreshLayout.isRefreshing && it.source.append is LoadState.Loading) {
-                    viewBinding.homeSwipeRefreshLayout.isRefreshing = false
+
+                homeWallpaperRecyclerAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+                homeWallpaperRecyclerAdapter.addLoadStateListener {
+                    if (viewBinding.homeSwipeRefreshLayout.isRefreshing && it.source.append is LoadState.Loading) {
+                        viewBinding.homeSwipeRefreshLayout.isRefreshing = false
+                    }
+                    viewBinding.noPhotosFoundView.isVisible =
+                        it.append is LoadState.Loading && homeWallpaperRecyclerAdapter.itemCount == 0
                 }
-                viewBinding.noPhotosFoundView.isVisible =
-                    it.append is LoadState.Loading && homeWallpaperRecyclerAdapter.itemCount == 0
+
+                val footerAdapter =
+                    HomePagedWallpaperAdapter.HomeLoadStateAdapter(homeWallpaperRecyclerAdapter::retry)
+                concatAdapter = homeWallpaperRecyclerAdapter.withLoadStateFooter(footerAdapter)
             }
-            val footerAdapter =
-                HomePagedWallpaperAdapter.HomeLoadStateAdapter(homeWallpaperRecyclerAdapter::retry)
-            val concatAdapter = homeWallpaperRecyclerAdapter.withLoadStateFooter(footerAdapter)
-            homeWallpaperRecyclerView.layoutManager =
-                StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+
+            if (homeWallpaperRecyclerView.layoutManager == null) {
+                homeWallpaperRecyclerView.layoutManager =
+                    StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            }
             homeWallpaperRecyclerView.adapter = concatAdapter
 
             primaryFilterGroup.setOnCheckedStateChangeListener { group, checkedIds ->
                 if (checkedIds.isNotEmpty()) {
-                    currentOrder = when (checkedIds.first()) {
+                    val order = when (checkedIds.first()) {
                         R.id.chip_latest -> "latest"
                         else -> POPULAR
                     }
-                    refreshData()
+                    homeViewModel.updateSearchParams(order = order)
                 }
             }
 
             categoryFilterGroup.setOnCheckedStateChangeListener { group, checkedIds ->
-                currentCategory = if (checkedIds.isNotEmpty()) {
+                val category = if (checkedIds.isNotEmpty()) {
                     val chip = group.findViewById<com.google.android.material.chip.Chip>(checkedIds.first())
                     chip.text.toString()
                 } else {
                     null
                 }
-                refreshData()
+                homeViewModel.updateSearchParams(category = category)
             }
         }
 
         selectWallpaperTargetDialog = SelectWallpaperTargetDialog()
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            requireContext().settingsPref.data.collect {
-                val safeSearch = it[SAFE_SEARCH_PREF_KEY] ?: true
-                val orientation = it[ORIENTATION_PREF_KEY] ?: ALL
-                val imageType = it[IMAGE_TYPE_PREF_KEY] ?: ALL
-                
-                // If the preference order changes, we might want to update currentOrder
-                // but usually the chips should drive the session.
-                // For now, let's just use the chips' values or initial preference.
-
-                loadData(currentQuery, currentCategory, safeSearch, orientation, imageType, currentOrder)
-                startObservingNetworkState()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                homeViewModel.homeWallpaperFlow.collect { pagingData ->
+                    homeWallpaperRecyclerAdapter.submitData(pagingData)
+                }
             }
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                requireContext().settingsPref.data.collect {
+                    val safeSearch = it[SAFE_SEARCH_PREF_KEY] ?: true
+                    val orientation = it[ORIENTATION_PREF_KEY] ?: ALL
+                    val imageType = it[IMAGE_TYPE_PREF_KEY] ?: ALL
+
+                    homeViewModel.updateSearchParams(
+                        safeSearch = safeSearch,
+                        orientation = orientation,
+                        imageType = imageType
+                    )
+                }
+            }
+        }
+
+        startObservingNetworkState()
+
         viewBinding.actionSearchView.setOnEditorActionListener { tv: TextView, aID: Int, _ ->
             if (aID == EditorInfo.IME_ACTION_SEARCH) {
-                currentQuery = viewBinding.actionSearchView.text.toString()
-                refreshData()
+                homeViewModel.updateSearchParams(query = viewBinding.actionSearchView.text.toString())
                 true
             } else {
                 false
@@ -226,18 +242,6 @@ class HomeFragment : Fragment() {
 
         viewBinding.actionSettings.setOnClickListener {
             findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToSettingsFragment())
-        }
-    }
-
-    private fun refreshData() {
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            requireContext().settingsPref.data.collect {
-                val safeSearch = it[SAFE_SEARCH_PREF_KEY] ?: true
-                val orientation = it[ORIENTATION_PREF_KEY] ?: ALL
-                val imageType = it[IMAGE_TYPE_PREF_KEY] ?: ALL
-                
-                loadData(currentQuery, currentCategory, safeSearch, orientation, imageType, currentOrder)
-            }
         }
     }
 
@@ -263,14 +267,6 @@ class HomeFragment : Fragment() {
                         viewBinding.homeSwipeRefreshLayout.isEnabled = true
                     }
                 }
-            }
-        }
-    }
-
-    private fun loadData(query: String?, category: String?, safeSearch: Boolean, orientation: String, imageType: String, order: String) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            homeViewModel.homeWallpaperFlow(query, category, safeSearch, orientation, imageType, order).collectLatest {
-                homeWallpaperRecyclerAdapter.submitData(it)
             }
         }
     }

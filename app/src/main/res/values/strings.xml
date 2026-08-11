@@ -14,6 +14,7 @@
     <string name="wallpaper_not_set">Wallpaper not set</string>
     <string name="error_loading_wallpapers">Error loading wallpapers</string>
     <string name="no_wallpaper_found">No wallpaper found</string>
+    <string name="no_favourites_found">No favourites found</string>
     <string name="downloading_wallpaer">Downloading new wallpaper</string>
     <string name="download_in_progress">Download in progress</string>
     <!-- Preference Titles -->

@@ -75,6 +75,8 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
             viewModel.getFavourites().collectLatest {
                 viewBinding?.let { binding ->
                     binding.progressBar.isVisible = false
+                    binding.emptyStateContainer.isVisible = it.isEmpty()
+                    binding.favouritesRecyclerView.isVisible = it.isNotEmpty()
                 }
                 adapter.submitList(it)
             }

@@ -1,5 +1,7 @@
 package com.turingheights.wally.settings.views
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.ViewCompat
@@ -11,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.turingheights.wally.BuildConfig
 import com.turingheights.wally.R
 import com.turingheights.wally.databinding.FragmentSettingsBinding
 import com.turingheights.wally.settings.viewsmodels.SettingsViewModel
@@ -55,6 +58,36 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     SettingsFragmentDirections.actionSettingsFragmentToOrderDialog(order)
                 )
             }
+
+            rateUsCard.setOnClickListener {
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    data = Uri.parse("market://details?id=${requireContext().packageName}")
+                }
+                startActivity(intent)
+            }
+
+            shareAppCard.setOnClickListener {
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, "Check out Wally for amazing wallpapers: https://play.google.com/store/apps/details?id=${requireContext().packageName}")
+                }
+                startActivity(Intent.createChooser(shareIntent, "Share Wally via"))
+            }
+
+            feedbackCard.setOnClickListener {
+                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse("mailto:hello@turingheights.com")
+                    putExtra(Intent.EXTRA_SUBJECT, "Wally App Feedback")
+                }
+                startActivity(Intent.createChooser(emailIntent, "Send Feedback"))
+            }
+
+            privacyPolicyCard.setOnClickListener {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://turingheights.com/apps/wally/privacy"))
+                startActivity(browserIntent)
+            }
+
+            versionName.text = BuildConfig.VERSION_NAME
         }
 
         viewLifecycleOwner.lifecycleScope.launch {

@@ -42,6 +42,16 @@
     <string name="orientation_summary">Landscape or portrait images</string>
     <string name="image_type_summary">Category of images to load</string>
     <string name="order_summary">Sort by popularity or latest</string>
+    <string name="rate_us">Rate Us</string>
+    <string name="rate_us_summary">Love the app? Let us know on Play Store</string>
+    <string name="share_app">Share App</string>
+    <string name="share_app_summary">Spread the word with friends and family</string>
+    <string name="feedback">Feedback</string>
+    <string name="feedback_summary">Got suggestions or issues? Email us</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="privacy_policy_summary">Read our privacy terms</string>
+    <string name="version">Version</string>
+    <string name="support_about">Support &amp; About</string>
     <string name="all_caps">ALL</string>
     <string name="popular_caps">POPULAR</string>
     <string name="favourites">Favourites</string>

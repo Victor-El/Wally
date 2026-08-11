@@ -5,8 +5,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import dagger.hilt.android.AndroidEntryPoint
+import com.turingheights.wally.commons.utils.CacheCleanupWorker
 import com.turingheights.wally.databinding.ActivityMainBinding
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -23,5 +28,18 @@ class MainActivity : AppCompatActivity() {
 
         navController =
             (supportFragmentManager.findFragmentById(viewBinding.navHost.id) as NavHostFragment).navController
+
+        scheduleCacheCleanup()
+    }
+
+    private fun scheduleCacheCleanup() {
+        val cleanupRequest = PeriodicWorkRequestBuilder<CacheCleanupWorker>(1, TimeUnit.DAYS)
+            .build()
+
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            "CacheCleanup",
+            ExistingPeriodicWorkPolicy.KEEP,
+            cleanupRequest
+        )
     }
 }

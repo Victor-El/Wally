@@ -14,8 +14,11 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import com.turingheights.wally.R
@@ -60,21 +63,52 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
                 findNavController().navigateUp()
             }
 
-            Glide.with(requireContext()).asBitmap().load(arg.photo.largeImageURL)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(
-                        resource: Bitmap,
-                        transition: Transition<in Bitmap>?
-                    ) {
-
-                        binding.photoView.setImageBitmap(resource)
+            Glide.with(requireContext())
+                .load(arg.photo.largeImageURL)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .thumbnail(
+                    Glide.with(requireContext())
+                        .load(arg.photo.webformatURL)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .thumbnail(
+                            Glide.with(requireContext())
+                                .load(arg.photo.previewURL)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        )
+                )
+                .error(
+                    Glide.with(requireContext())
+                        .load(arg.photo.webformatURL)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .error(
+                            Glide.with(requireContext())
+                                .load(arg.photo.previewURL)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        )
+                )
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
                         binding.cropImageProgressBar.isVisible = false
+                        return false
                     }
 
-                    override fun onLoadCleared(placeholder: Drawable?) {
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
                         binding.cropImageProgressBar.isVisible = false
+                        return false
                     }
                 })
+                .into(binding.photoView)
 
             binding.setWallpaper.setOnClickListener {
                 selectWallpaperTargetDialog.bindListener(object :

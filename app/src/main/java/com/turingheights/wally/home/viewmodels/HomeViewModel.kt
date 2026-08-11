@@ -22,6 +22,7 @@ import com.turingheights.wally.commons.utils.POPULAR
 import com.turingheights.wally.commons.utils.WallyDownloader
 import com.turingheights.wally.home.data.remote.HomeScreenWallpaperService
 import com.turingheights.wally.home.repository.HomeWallpaperPagingSource
+import com.turingheights.wally.commons.data.local.daos.CachedPhotoDao
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,7 +30,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val homeScreenWallpaperService: HomeScreenWallpaperService,
     private val wallyDownloader: WallyDownloader,
-    private val favouritesService: FavouritePhotosRepository
+    private val favouritesService: FavouritePhotosRepository,
+    private val cachedPhotoDao: CachedPhotoDao
 ): ViewModel() {
 
     data class SearchParams(
@@ -49,6 +51,7 @@ class HomeViewModel @Inject constructor(
         Pager(PagingConfig(HOME_WALLPAPER_PAGE_SIZE)) {
             HomeWallpaperPagingSource(
                 homeScreenWallpaperService,
+                cachedPhotoDao,
                 params.safeSearch,
                 params.orientation,
                 params.imageType,

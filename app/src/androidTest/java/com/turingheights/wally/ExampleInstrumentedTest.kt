@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("me.codeenzyme.wally", appContext.packageName)
+        assertEquals("com.turingheights.wally.debug", appContext.packageName)
     }
 }

@@ -9,14 +9,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.google.android.material.snackbar.Snackbar
+import android.widget.Toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -47,6 +50,12 @@ class SetCroppedImageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val viewBinding = FragmentSetCroppedImageBinding.bind(view)
+
+        ViewCompat.setOnApplyWindowInsetsListener(viewBinding.setWallpaperRoot) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = insets.top)
+            windowInsets
+        }
 
         val displayMetrics = DisplayMetrics()
         requireActivity().windowManager.defaultDisplay.getRealMetrics(displayMetrics)
@@ -102,10 +111,10 @@ class SetCroppedImageFragment : Fragment() {
 
                         if (!success) {
                             withContext(Dispatchers.Main) {
-                                Snackbar.make(
-                                    viewBinding.root,
-                                    requireContext().getString(R.string.wallpaper_not_set),
-                                    Snackbar.LENGTH_LONG
+                                Toast.makeText(
+                                    requireContext(),
+                                    R.string.wallpaper_not_set,
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             }
                         }

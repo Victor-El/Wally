@@ -20,7 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.google.android.material.snackbar.Snackbar
+import android.widget.Toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -81,8 +81,7 @@ class HomeFragment : Fragment() {
             )
             homeSwipeRefreshLayout.setOnRefreshListener {
                 viewBinding.networkErrorView.isVisible = false
-                homeWallpaperRecyclerAdapter.retry()
-                homeSwipeRefreshLayout.isEnabled = false
+                homeWallpaperRecyclerAdapter.refresh()
             }
 
             if (!::homeWallpaperRecyclerAdapter.isInitialized) {
@@ -93,19 +92,19 @@ class HomeFragment : Fragment() {
                             when (menuItem.itemId) {
                                 R.id.action_home_popup_download -> {
                                     homeViewModel.startDownload(photo.largeImageURL)
-                                    Snackbar.make(
-                                        view,
+                                    Toast.makeText(
+                                        requireContext(),
                                         "Downloading...",
-                                        Snackbar.LENGTH_LONG
+                                        Toast.LENGTH_SHORT
                                     ).show()
                                 }
 
                                 R.id.action_home_popup_favourite -> {
                                     homeViewModel.addToFavourites(photo)
-                                    Snackbar.make(
-                                        view,
+                                    Toast.makeText(
+                                        requireContext(),
                                         "Added to favorite",
-                                        Snackbar.LENGTH_LONG
+                                        Toast.LENGTH_SHORT
                                     ).show()
                                 }
 
@@ -164,7 +163,7 @@ class HomeFragment : Fragment() {
                 homeWallpaperRecyclerAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
                 homeWallpaperRecyclerAdapter.addLoadStateListener {
-                    if (viewBinding.homeSwipeRefreshLayout.isRefreshing && it.source.append is LoadState.Loading) {
+                    if (viewBinding.homeSwipeRefreshLayout.isRefreshing && it.source.refresh is LoadState.NotLoading) {
                         viewBinding.homeSwipeRefreshLayout.isRefreshing = false
                     }
                     viewBinding.noPhotosFoundView.isVisible =
@@ -257,7 +256,6 @@ class HomeFragment : Fragment() {
                                 viewBinding.homeSwipeRefreshLayout.isRefreshing = false
                             }
                             viewBinding.homeProgressBar.isVisible = false
-                            viewBinding.homeSwipeRefreshLayout.isEnabled = false
                         }
                         WallpaperDataNetworkState.Failure -> {
                             if (viewBinding.homeSwipeRefreshLayout.isRefreshing) {
@@ -265,7 +263,6 @@ class HomeFragment : Fragment() {
                             }
                             viewBinding.homeProgressBar.isVisible = false
                             viewBinding.networkErrorView.isVisible = true
-                            viewBinding.homeSwipeRefreshLayout.isEnabled = true
                         }
                     }
                 }

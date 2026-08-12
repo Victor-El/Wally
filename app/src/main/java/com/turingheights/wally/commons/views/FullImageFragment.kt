@@ -19,7 +19,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.google.android.material.snackbar.Snackbar
+import android.widget.Toast
 import dagger.hilt.android.AndroidEntryPoint
 import com.turingheights.wally.R
 import com.turingheights.wally.databinding.FragmentFullImageBinding
@@ -155,20 +155,20 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
 
             binding.favouriteWallpaper.setOnClickListener {
                 viewModel.addToFavourites(arg.photo)
-                Snackbar.make(
-                    viewBinding!!.root,
+                Toast.makeText(
+                    requireContext(),
                     "Adding to Favourites ... ",
-                    Snackbar.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
 
 
             binding.downloadWallpaper.setOnClickListener {
                 viewModel.startDownload(arg.photo.largeImageURL)
-                Snackbar.make(
-                    viewBinding!!.root,
+                Toast.makeText(
+                    requireContext(),
                     "Downloading...",
-                    Snackbar.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         }

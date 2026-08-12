@@ -18,8 +18,8 @@ android {
         manifestPlaceholders = [appName: "Wally"]
         minSdkVersion 24
         targetSdkVersion 36
-        versionCode 5
-        versionName "2.0.1"
+        versionCode 6
+        versionName "2.02"
 
         testInstrumentationRunner "com.turingheights.wally.HiltTestRunner"
     }
@@ -126,6 +126,9 @@ dependencies {
 
     // WorkManager
     implementation "androidx.work:work-runtime-ktx:2.9.0"
+
+    // In-app updates
+    implementation "com.google.android.play:app-update-ktx:2.1.0"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.13.1'

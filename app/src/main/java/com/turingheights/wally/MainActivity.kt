@@ -45,9 +45,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.Theme_Wally)
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        setTheme(R.style.Theme_Wally)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
@@ -55,7 +55,9 @@ class MainActivity : AppCompatActivity() {
             (supportFragmentManager.findFragmentById(viewBinding.navHost.id) as NavHostFragment).navController
 
         appUpdateManager = AppUpdateManagerFactory.create(this)
-        checkForAppUpdate()
+        if (savedInstanceState == null) {
+            checkForAppUpdate()
+        }
         appUpdateManager.registerListener(installStateUpdatedListener)
 
         scheduleCacheCleanup()

@@ -24,19 +24,28 @@ import com.turingheights.wally.databinding.ItemPhotoLayoutBinding
 import com.turingheights.wally.databinding.LayoutHomeLoadStateBinding
 import timber.log.Timber
 
-class HomePagedWallpaperAdapter(private val actionMoreListener: (Photo, Int, View) -> Unit, private val callBack: (Photo) -> Unit) :
-    PagingDataAdapter<Photo, HomePagedWallpaperAdapter.PhotoItemViewHolder>(PhotoComparator) {
+class HomePagedWallpaperAdapter(
+    private val actionMoreListener: (Photo, Int, View) -> Unit,
+    private val callBack: (Photo) -> Unit
+) : PagingDataAdapter<Photo, HomePagedWallpaperAdapter.PhotoItemViewHolder>(PhotoComparator) {
 
-    inner class PhotoItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class PhotoItemViewHolder(
+        private val viewBinding: ItemPhotoLayoutBinding
+    ) : RecyclerView.ViewHolder(viewBinding.root) {
+
         fun bind(photo: Photo, pos: Int) {
-            val viewBinding = ItemPhotoLayoutBinding.bind(itemView)
+            viewBinding.photoShimmer.isVisible = true
+            viewBinding.photoShimmer.startShimmer()
+            viewBinding.photoMain.visibility = View.INVISIBLE
+            viewBinding.moreActionImageView.isVisible = false
+
             viewBinding.root.setOnClickListener {
                 callBack(photo)
             }
-            viewBinding.moreActionImageView.run {
-                isVisible = false
-                setOnClickListener { actionMoreListener(photo, pos, it) }
+            viewBinding.moreActionImageView.setOnClickListener {
+                actionMoreListener(photo, pos, it)
             }
+
             Glide.with(viewBinding.root.context)
                 .load(photo.webformatURL)
                 .thumbnail(Glide.with(viewBinding.root.context).load(photo.previewURL))
@@ -50,8 +59,9 @@ class HomePagedWallpaperAdapter(private val actionMoreListener: (Photo, Int, Vie
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
+                        viewBinding.photoShimmer.stopShimmer()
                         viewBinding.photoShimmer.isVisible = false
-                        viewBinding.photoMain.isVisible = true
+                        viewBinding.photoMain.visibility = View.VISIBLE
                         return false
                     }
 
@@ -62,13 +72,14 @@ class HomePagedWallpaperAdapter(private val actionMoreListener: (Photo, Int, Vie
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
+                        viewBinding.photoShimmer.stopShimmer()
                         viewBinding.photoShimmer.isVisible = false
-                        viewBinding.photoMain.isVisible = true
+                        viewBinding.photoMain.visibility = View.VISIBLE
                         viewBinding.moreActionImageView.isVisible = true
                         return false
                     }
-
-                }).into(viewBinding.photoItemView)
+                })
+                .into(viewBinding.photoItemView)
         }
     }
 
@@ -83,19 +94,23 @@ class HomePagedWallpaperAdapter(private val actionMoreListener: (Photo, Int, Vie
     }
 
     override fun onBindViewHolder(holder: PhotoItemViewHolder, position: Int) {
-        holder.bind(getItem(position)!!, position)
+        getItem(position)?.let { photo ->
+            holder.bind(photo, position)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoItemViewHolder {
         val viewBinding =
             ItemPhotoLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         Timber.d("Created")
-        return PhotoItemViewHolder(viewBinding.root)
+        return PhotoItemViewHolder(viewBinding)
     }
 
-    class HomeLoadStateAdapter(private val retry: () -> Unit) : LoadStateAdapter<HomeLoadStateViewHolder>() {
+    class HomeLoadStateAdapter(private val retry: () -> Unit) :
+        LoadStateAdapter<HomeLoadStateViewHolder>() {
+
         override fun onBindViewHolder(holder: HomeLoadStateViewHolder, loadState: LoadState) {
-            (holder.itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan = true
+            (holder.itemView.layoutParams as? StaggeredGridLayoutManager.LayoutParams)?.isFullSpan = true
             holder.bind(loadState, retry)
         }
 
@@ -108,7 +123,6 @@ class HomePagedWallpaperAdapter(private val actionMoreListener: (Photo, Int, Vie
                     .inflate(R.layout.layout_home_load_state, parent, false)
             )
         }
-
     }
 
     class HomeLoadStateViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -118,10 +132,6 @@ class HomePagedWallpaperAdapter(private val actionMoreListener: (Photo, Int, Vie
             binding.errRetryBtn.setOnClickListener {
                 retry()
             }
-            /*if (loadState is LoadState.Error) {
-                binding.errorMsgView.text = loadState.error.localizedMessage
-            }*/
-
             binding.errorMsgView.isVisible = loadState is LoadState.Error
             binding.errRetryBtn.isVisible = loadState is LoadState.Error
             binding.progressBar.isVisible = loadState is LoadState.Loading

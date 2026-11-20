@@ -1,14 +1,13 @@
 package com.turingheights.wally.settings.viewsmodels
 
 import android.content.Context
-import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.turingheights.wally.commons.preferencestore.IMAGE_TYPE_PREF_KEY
+import com.turingheights.wally.commons.preferencestore.ORIENTATION_PREF_KEY
+import com.turingheights.wally.commons.preferencestore.settingsPref
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import com.turingheights.wally.commons.preferencestore.*
 
-class SettingsViewModel: ViewModel() {
+class SettingsViewModel : ViewModel() {
 
     fun getOrientation(context: Context) = context.settingsPref.data.map {
         it[ORIENTATION_PREF_KEY]?.uppercase() ?: "ALL"
@@ -16,9 +15,5 @@ class SettingsViewModel: ViewModel() {
 
     fun getImageType(context: Context) = context.settingsPref.data.map {
         it[IMAGE_TYPE_PREF_KEY]?.uppercase() ?: "ALL"
-    }
-
-    fun getOrder(context: Context) = context.settingsPref.data.map {
-        it[ORDER_PREF_KEY]?.uppercase() ?: "POPULAR"
     }
 }

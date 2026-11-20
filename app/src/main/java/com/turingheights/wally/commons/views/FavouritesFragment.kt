@@ -26,13 +26,13 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import com.turingheights.wally.R
 import com.turingheights.wally.commons.models.Photo
 import com.turingheights.wally.commons.viewmodels.FavouritesViewModel
 import com.turingheights.wally.databinding.FragmentFavouritesBinding
 import com.turingheights.wally.databinding.ItemFavouritePhotoLayoutBinding
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -55,7 +55,7 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
             windowInsets
         }
 
-        adapter = FavouritesAdapter ({
+        adapter = FavouritesAdapter({
             findNavController().navigate(
                 FavouritesFragmentDirections.actionFavouritesFragmentToFullImageFragment(it)
             )
@@ -66,7 +66,8 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
             it.actionSettingsClose.setOnClickListener {
                 findNavController().navigateUp()
             }
-            it.favouritesRecyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            it.favouritesRecyclerView.layoutManager =
+                StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             it.favouritesRecyclerView.adapter = adapter
         }
 
@@ -75,7 +76,7 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
 
     private fun observe() {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getFavourites().collectLatest {
                     viewBinding?.let { binding ->
                         binding.progressBar.isVisible = false
@@ -85,66 +86,72 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
                     adapter.submitList(it)
                 }
             }
-
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        viewBinding?.favouritesRecyclerView?.adapter = null
         viewBinding = null
+        super.onDestroyView()
     }
 
-    class FavouritesAdapter(private val callback: (Photo) -> Unit, private val deleteCallback: (Photo) -> Unit): ListAdapter<Photo, FavouritesAdapter.FavouriteViewHolder>(PhotoDiffUtilItemCallback) {
+    class FavouritesAdapter(
+        private val callback: (Photo) -> Unit,
+        private val deleteCallback: (Photo) -> Unit
+    ) : ListAdapter<Photo, FavouritesAdapter.FavouriteViewHolder>(PhotoDiffUtilItemCallback) {
 
         inner class FavouriteViewHolder(private val viewBinding: ItemFavouritePhotoLayoutBinding) :
             RecyclerView.ViewHolder(viewBinding.root) {
 
-                fun bind(photo: Photo) {
-                    viewBinding.let {
+            fun bind(photo: Photo) {
+                viewBinding.photoShimmer.isVisible = true
+                viewBinding.photoShimmer.startShimmer()
+                viewBinding.photoMain.visibility = View.INVISIBLE
+                viewBinding.moreActionImageView.isVisible = false
 
-                        it.root.setOnClickListener {
-                            callback(photo)
-                        }
-
-                        it.moreActionImageView.setOnClickListener {
-                            deleteCallback(photo)
-                        }
-
-                        Glide.with(viewBinding.root.context)
-                            .load(photo.webformatURL)
-                            .thumbnail(Glide.with(viewBinding.root.context).load(photo.previewURL))
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .transition(DrawableTransitionOptions.withCrossFade())
-                            .listener(object : RequestListener<Drawable> {
-                                override fun onLoadFailed(
-                                    e: GlideException?,
-                                    model: Any?,
-                                    target: Target<Drawable>?,
-                                    isFirstResource: Boolean
-                                ): Boolean {
-                                    viewBinding.photoShimmer.isVisible = false
-                                    viewBinding.photoMain.isVisible = true
-                                    return false
-                                }
-
-                                override fun onResourceReady(
-                                    resource: Drawable?,
-                                    model: Any?,
-                                    target: Target<Drawable>?,
-                                    dataSource: DataSource?,
-                                    isFirstResource: Boolean
-                                ): Boolean {
-                                    viewBinding.photoShimmer.isVisible = false
-                                    viewBinding.photoMain.isVisible = true
-                                    viewBinding.moreActionImageView.isVisible = true
-                                    return false
-                                }
-
-                            }).into(viewBinding.photoItemView)
-                    }
+                viewBinding.root.setOnClickListener {
+                    callback(photo)
                 }
 
+                viewBinding.moreActionImageView.setOnClickListener {
+                    deleteCallback(photo)
+                }
+
+                Glide.with(viewBinding.root.context)
+                    .load(photo.webformatURL)
+                    .thumbnail(Glide.with(viewBinding.root.context).load(photo.previewURL))
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            viewBinding.photoShimmer.stopShimmer()
+                            viewBinding.photoShimmer.isVisible = false
+                            viewBinding.photoMain.visibility = View.VISIBLE
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            viewBinding.photoShimmer.stopShimmer()
+                            viewBinding.photoShimmer.isVisible = false
+                            viewBinding.photoMain.visibility = View.VISIBLE
+                            viewBinding.moreActionImageView.isVisible = true
+                            return false
+                        }
+                    })
+                    .into(viewBinding.photoItemView)
             }
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavouriteViewHolder {
             val binding = ItemFavouritePhotoLayoutBinding.inflate(
@@ -158,7 +165,6 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
         override fun onBindViewHolder(holder: FavouriteViewHolder, position: Int) {
             holder.bind(getItem(position))
         }
-
     }
 
     object PhotoDiffUtilItemCallback : DiffUtil.ItemCallback<Photo>() {
@@ -169,7 +175,5 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
         override fun areContentsTheSame(oldItem: Photo, newItem: Photo): Boolean {
             return oldItem == newItem
         }
-
     }
-
 }

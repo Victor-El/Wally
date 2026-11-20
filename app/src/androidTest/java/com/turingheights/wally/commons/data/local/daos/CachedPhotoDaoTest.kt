@@ -98,4 +98,36 @@ class CachedPhotoDaoTest {
 
         assertThat(cachedPhotos).isEmpty()
     }
+
+    @Test
+    fun deleteExpiredCache_removesOldEntriesAndKeepsFreshOnes() = runTest {
+        val now = System.currentTimeMillis()
+        val expiredMetadata = CacheMetadataEntity(
+            query = "old",
+            category = null,
+            safeSearch = true,
+            orientation = "all",
+            imageType = "all",
+            order = "popular",
+            timestamp = now - 10_000L
+        )
+        val freshMetadata = CacheMetadataEntity(
+            query = "fresh",
+            category = null,
+            safeSearch = true,
+            orientation = "all",
+            imageType = "all",
+            order = "popular",
+            timestamp = now
+        )
+
+        dao.saveCache(expiredMetadata, listOf(mockPhoto))
+        dao.saveCache(freshMetadata, listOf(mockPhoto))
+
+        val deletedCount = dao.deleteExpiredCache(now - 5_000L)
+
+        assertThat(deletedCount).isEqualTo(1)
+        assertThat(dao.getCachedPhotos("old", null, true, "all", "all", "popular")).isEmpty()
+        assertThat(dao.getCachedPhotos("fresh", null, true, "all", "all", "popular")).hasSize(1)
+    }
 }

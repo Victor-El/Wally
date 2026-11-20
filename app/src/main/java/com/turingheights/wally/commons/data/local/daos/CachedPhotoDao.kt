@@ -77,4 +77,7 @@ interface CachedPhotoDao {
         val metadata = getLatestMetadata(query, category, safeSearch, orientation, imageType, order)
         return metadata?.let { getPhotosForMetadata(it.id) } ?: emptyList()
     }
+
+    @Query("DELETE FROM cache_metadata WHERE timestamp < :cutoffTimestamp")
+    suspend fun deleteExpiredCache(cutoffTimestamp: Long): Int
 }

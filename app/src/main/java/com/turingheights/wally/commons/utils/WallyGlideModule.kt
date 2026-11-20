@@ -1,10 +1,10 @@
 package com.turingheights.wally.commons.utils
 
 import android.content.Context
-import android.os.Environment
 import android.os.StatFs
 import com.bumptech.glide.GlideBuilder
 import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.load.engine.cache.DiskCacheAdapter
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory
 import com.bumptech.glide.load.engine.cache.LruResourceCache
 import com.bumptech.glide.module.AppGlideModule
@@ -14,21 +14,18 @@ import timber.log.Timber
 class WallyGlideModule : AppGlideModule() {
 
     override fun applyOptions(context: Context, builder: GlideBuilder) {
-        val minStorageRequired = 50 * 1024 * 1024 // 50MB
+        val minStorageRequired = 50L * 1024 * 1024 // 50MB
         if (!isStorageAvailable(context, minStorageRequired)) {
             Timber.w("Low storage detected. Disabling disk cache.")
-            // Effectively disable disk cache by setting size to 0
-            builder.setDiskCache(InternalCacheDiskCacheFactory(context, 0))
+            builder.setDiskCache { DiskCacheAdapter() }
         } else {
-            // Default behavior or custom size
-            builder.setDiskCache(InternalCacheDiskCacheFactory(context, 250 * 1024 * 1024)) // 250MB
+            builder.setDiskCache(InternalCacheDiskCacheFactory(context, 250L * 1024 * 1024)) // 250MB
         }
-        
-        // Increase memory cache slightly for better performance
-        builder.setMemoryCache(LruResourceCache(20 * 1024 * 1024)) // 20MB
+
+        builder.setMemoryCache(LruResourceCache(20L * 1024 * 1024)) // 20MB
     }
 
-    private fun isStorageAvailable(context: Context, requiredBytes: Int): Boolean {
+    private fun isStorageAvailable(context: Context, requiredBytes: Long): Boolean {
         return try {
             val path = context.cacheDir
             val stat = StatFs(path.path)

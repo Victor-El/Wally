@@ -1,10 +1,11 @@
 package com.turingheights.wally.commons.di.modules
 
+import com.turingheights.wally.BuildConfig
+import com.turingheights.wally.commons.utils.BASE_API_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import com.turingheights.wally.commons.utils.BASE_API_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -19,16 +20,24 @@ class NetworkModule {
     @Singleton
     @Provides
     fun providesRetrofit(): Retrofit {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+        }
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BASE_API_URL)
-            .client(OkHttpClient.Builder().also {
-                it.connectTimeout(30, TimeUnit.SECONDS)
-                it.readTimeout(30, TimeUnit.SECONDS)
-                it.writeTimeout(30, TimeUnit.SECONDS)
-                it.addInterceptor(HttpLoggingInterceptor())
-            }.build())
+            .client(
+                OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
+                    .addInterceptor(loggingInterceptor)
+                    .build()
+            )
             .build()
     }
-
 }

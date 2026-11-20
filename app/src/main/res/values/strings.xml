@@ -77,4 +77,9 @@
     <string name="buildings">buildings</string>
     <string name="business">business</string>
     <string name="music">music</string>
+    <string name="storage_permission_required">Storage permission is required to download wallpapers</string>
+    <string name="added_to_favourites">Added to favourites</string>
+    <string name="downloading">Downloading…</string>
+    <string name="download_failed">Download failed</string>
+    <string name="no_app_available">No app available to open this link</string>
 </resources>

@@ -1,10 +1,15 @@
 package com.turingheights.wally.commons.views
 
-import android.graphics.Bitmap
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -19,11 +24,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import android.widget.Toast
-import dagger.hilt.android.AndroidEntryPoint
 import com.turingheights.wally.R
+import com.turingheights.wally.commons.viewmodels.FullImageViewModel
 import com.turingheights.wally.databinding.FragmentFullImageBinding
-import com.turingheights.wally.home.viewmodels.HomeViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class FullImageFragment : Fragment(R.layout.fragment_full_image) {
@@ -32,19 +36,51 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
 
     private val arg by navArgs<FullImageFragmentArgs>()
 
-    private val viewModel by viewModels<HomeViewModel>()
+    private val viewModel by viewModels<FullImageViewModel>()
 
-    private lateinit var selectWallpaperTargetDialog: SelectWallpaperTargetDialog
+    private var pendingDownloadUrl: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        selectWallpaperTargetDialog = SelectWallpaperTargetDialog()
+    private val storagePermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        val url = pendingDownloadUrl
+        pendingDownloadUrl = null
+        if (isGranted && url != null) {
+            enqueueDownload(url)
+        } else if (!isGranted) {
+            Toast.makeText(
+                requireContext(),
+                R.string.storage_permission_required,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* Notification permission is optional; download proceeds regardless */ }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         viewBinding = FragmentFullImageBinding.bind(view)
+
+        childFragmentManager.setFragmentResultListener(
+            SelectWallpaperTargetDialog.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val targetName = bundle.getString(SelectWallpaperTargetDialog.RESULT_TARGET) ?: return@setFragmentResultListener
+            val url = bundle.getString(SelectWallpaperTargetDialog.RESULT_URL) ?: return@setFragmentResultListener
+            val target = runCatching {
+                SetCroppedImageFragment.WallpaperTarget.valueOf(targetName)
+            }.getOrNull() ?: return@setFragmentResultListener
+
+            findNavController().navigate(
+                FullImageFragmentDirections.actionFullImageFragmentToSetCroppedImageFragment(
+                    SetCroppedImageFragment.Data(target, url)
+                )
+            )
+        }
 
         viewBinding?.let { binding ->
 
@@ -63,25 +99,25 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
                 findNavController().navigateUp()
             }
 
-            Glide.with(requireContext())
+            Glide.with(this)
                 .load(arg.photo.largeImageURL)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .thumbnail(
-                    Glide.with(requireContext())
+                    Glide.with(this)
                         .load(arg.photo.webformatURL)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .thumbnail(
-                            Glide.with(requireContext())
+                            Glide.with(this)
                                 .load(arg.photo.previewURL)
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                         )
                 )
                 .error(
-                    Glide.with(requireContext())
+                    Glide.with(this)
                         .load(arg.photo.webformatURL)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .error(
-                            Glide.with(requireContext())
+                            Glide.with(this)
                                 .load(arg.photo.previewURL)
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                         )
@@ -93,7 +129,7 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding.cropImageProgressBar.isVisible = false
+                        viewBinding?.cropImageProgressBar?.isVisible = false
                         return false
                     }
 
@@ -104,74 +140,61 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding.cropImageProgressBar.isVisible = false
+                        viewBinding?.cropImageProgressBar?.isVisible = false
                         return false
                     }
                 })
                 .into(binding.photoView)
 
             binding.setWallpaper.setOnClickListener {
-                selectWallpaperTargetDialog.bindListener(object :
-                    SelectWallpaperTargetDialog.SelectTargetListener {
-                    override fun onHomeSelected() {
-                        findNavController().navigate(
-                            FullImageFragmentDirections.actionFullImageFragmentToSetCroppedImageFragment(
-                                SetCroppedImageFragment.Data(
-                                    SetCroppedImageFragment.WallpaperTarget.HOME,
-                                    arg.photo.largeImageURL
-                                )
-                            )
-                        )
-                    }
-
-                    override fun onLockSelected() {
-                        findNavController().navigate(
-                            FullImageFragmentDirections.actionFullImageFragmentToSetCroppedImageFragment(
-                                SetCroppedImageFragment.Data(
-                                    SetCroppedImageFragment.WallpaperTarget.LOCK,
-                                    arg.photo.largeImageURL
-                                )
-                            )
-                        )
-                    }
-
-                    override fun onBothSelected() {
-                        findNavController().navigate(
-                            FullImageFragmentDirections.actionFullImageFragmentToSetCroppedImageFragment(
-                                SetCroppedImageFragment.Data(
-                                    SetCroppedImageFragment.WallpaperTarget.BOTH,
-                                    arg.photo.largeImageURL
-                                )
-                            )
-                        )
-                    }
-                })
-                selectWallpaperTargetDialog.show(
-                    requireActivity().supportFragmentManager,
-                    "selectDialog"
-                )
+                if (childFragmentManager.findFragmentByTag(SelectWallpaperTargetDialog.TAG) == null) {
+                    SelectWallpaperTargetDialog.newInstance(arg.photo.largeImageURL)
+                        .show(childFragmentManager, SelectWallpaperTargetDialog.TAG)
+                }
             }
-
 
             binding.favouriteWallpaper.setOnClickListener {
                 viewModel.addToFavourites(arg.photo)
                 Toast.makeText(
                     requireContext(),
-                    "Adding to Favourites ... ",
+                    R.string.added_to_favourites,
                     Toast.LENGTH_SHORT
                 ).show()
             }
-
 
             binding.downloadWallpaper.setOnClickListener {
-                viewModel.startDownload(arg.photo.largeImageURL)
-                Toast.makeText(
-                    requireContext(),
-                    "Downloading...",
-                    Toast.LENGTH_SHORT
-                ).show()
+                requestDownload(arg.photo.largeImageURL)
             }
         }
+    }
+
+    private fun requestDownload(url: String) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            val hasPermission = ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!hasPermission) {
+                pendingDownloadUrl = url
+                storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                return
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasNotifPermission = ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!hasNotifPermission) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+        enqueueDownload(url)
+    }
+
+    private fun enqueueDownload(url: String) {
+        val started = viewModel.startDownload(url)
+        val messageRes = if (started) R.string.downloading else R.string.download_failed
+        Toast.makeText(requireContext(), messageRes, Toast.LENGTH_SHORT).show()
     }
 
     private fun Int.dpToPx(): Int {
@@ -182,5 +205,4 @@ class FullImageFragment : Fragment(R.layout.fragment_full_image) {
         super.onDestroyView()
         viewBinding = null
     }
-
 }

@@ -13,9 +13,14 @@ android {
     namespace "com.turingheights.wally"
     compileSdkVersion 36
 
+    def wallyPropertiesFile = rootProject.file "wally.properties"
+    def wallyProperties = new Properties()
+    wallyProperties.load new FileInputStream(wallyPropertiesFile)
+    def sentryDsnValue = (wallyProperties.getProperty("SENTRY_DSN") ?: "").replace("\"", "")
+
     defaultConfig {
         applicationId "com.turingheights.wally"
-        manifestPlaceholders = [appName: "Wally"]
+        manifestPlaceholders = [appName: "Wally", sentryDsn: sentryDsnValue]
         minSdkVersion 24
         targetSdkVersion 36
         versionCode 6
@@ -27,10 +32,6 @@ android {
     room {
         schemaDirectory "$projectDir/schemas"
     }
-
-    def wallyPropertiesFile = rootProject.file "wally.properties"
-    def wallyProperties = new Properties()
-    wallyProperties.load new FileInputStream(wallyPropertiesFile)
 
     buildFeatures {
         viewBinding true
@@ -44,7 +45,7 @@ android {
             buildConfigField("String", "API_KEY", wallyProperties["API_KEY"])
 
             applicationIdSuffix ".debug"
-            manifestPlaceholders = [appName: "Wally (Debug)"]
+            manifestPlaceholders += [appName: "Wally (Debug)"]
         }
 
         release {

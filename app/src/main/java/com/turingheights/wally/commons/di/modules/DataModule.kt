@@ -1,12 +1,13 @@
 package com.turingheights.wally.commons.di.modules
 
 import android.content.Context
+import androidx.room.Room
+import com.turingheights.wally.commons.data.local.PhotoDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import com.turingheights.wally.commons.data.local.PhotoDatabase
 import javax.inject.Singleton
 
 @Module
@@ -16,10 +17,11 @@ class DataModule {
     @Provides
     @Singleton
     fun providesPhotoDatabase(@ApplicationContext context: Context): PhotoDatabase {
-        return PhotoDatabase.getInstance(context)
+        return Room.databaseBuilder(context, PhotoDatabase::class.java, "photo.db")
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
     fun providesCachedPhotoDao(database: PhotoDatabase) = database.cachedPhotoDao()
-
 }

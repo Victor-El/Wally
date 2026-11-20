@@ -1,9 +1,11 @@
 package com.turingheights.wally.settings.views
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -15,6 +17,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.turingheights.wally.BuildConfig
 import com.turingheights.wally.R
+import com.turingheights.wally.commons.utils.ALL
 import com.turingheights.wally.databinding.FragmentSettingsBinding
 import com.turingheights.wally.settings.viewsmodels.SettingsViewModel
 import kotlinx.coroutines.launch
@@ -23,13 +26,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private val settingsViewModel by viewModels<SettingsViewModel>()
 
-    private lateinit var orientation: String
-    private lateinit var imageType: String
-    private lateinit var order: String
+    private var _viewBinding: FragmentSettingsBinding? = null
+    private val viewBinding get() = _viewBinding!!
+
+    private var orientation: String = ALL
+    private var imageType: String = ALL
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val viewBinding = FragmentSettingsBinding.bind(view)
+        _viewBinding = FragmentSettingsBinding.bind(view)
 
         ViewCompat.setOnApplyWindowInsetsListener(viewBinding.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -44,7 +49,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
 
             orientationCard.setOnClickListener {
-                findNavController().navigate(SettingsFragmentDirections.actionSettingsFragmentToOrientationDialog(orientation))
+                findNavController().navigate(
+                    SettingsFragmentDirections.actionSettingsFragmentToOrientationDialog(orientation)
+                )
             }
 
             imageTypeCard.setOnClickListener {
@@ -53,25 +60,32 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 )
             }
 
-            orderCard.setOnClickListener {
-                findNavController().navigate(
-                    SettingsFragmentDirections.actionSettingsFragmentToOrderDialog(order)
-                )
-            }
-
             rateUsCard.setOnClickListener {
-                val intent = Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse("market://details?id=${requireContext().packageName}")
+                val packageName = requireContext().packageName
+                val marketIntent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("market://details?id=$packageName")
+                )
+                try {
+                    startActivity(marketIntent)
+                } catch (_: ActivityNotFoundException) {
+                    val webIntent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+                    )
+                    safeStartActivity(webIntent)
                 }
-                startActivity(intent)
             }
 
             shareAppCard.setOnClickListener {
                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
                     type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, "Check out Wally for amazing wallpapers: https://play.google.com/store/apps/details?id=${requireContext().packageName}")
+                    putExtra(
+                        Intent.EXTRA_TEXT,
+                        "Check out Wally for amazing wallpapers: https://play.google.com/store/apps/details?id=${requireContext().packageName}"
+                    )
                 }
-                startActivity(Intent.createChooser(shareIntent, "Share Wally via"))
+                safeStartActivity(Intent.createChooser(shareIntent, "Share Wally via"))
             }
 
             feedbackCard.setOnClickListener {
@@ -79,42 +93,48 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     data = Uri.parse("mailto:hello@turingheights.com")
                     putExtra(Intent.EXTRA_SUBJECT, "Wally App Feedback")
                 }
-                startActivity(Intent.createChooser(emailIntent, "Send Feedback"))
+                safeStartActivity(Intent.createChooser(emailIntent, "Send Feedback"))
             }
 
             privacyPolicyCard.setOnClickListener {
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://turingheights.com/apps/wally/privacy"))
-                startActivity(browserIntent)
+                val browserIntent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://turingheights.com/apps/wally/privacy")
+                )
+                safeStartActivity(browserIntent)
             }
 
             versionName.text = BuildConfig.VERSION_NAME
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                settingsViewModel.getOrientation(requireContext()).collect {
-                    orientation = it
-                    viewBinding.orientationState.text = it
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    settingsViewModel.getOrientation(requireContext()).collect {
+                        orientation = it
+                        _viewBinding?.orientationState?.text = it
+                    }
+                }
+                launch {
+                    settingsViewModel.getImageType(requireContext()).collect {
+                        imageType = it
+                        _viewBinding?.imageTypeState?.text = it
+                    }
                 }
             }
         }
+    }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                settingsViewModel.getImageType(requireContext()).collect {
-                    imageType = it
-                    viewBinding.imageTypeState.text = it
-                }
-            }
+    private fun safeStartActivity(intent: Intent) {
+        try {
+            startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(requireContext(), R.string.no_app_available, Toast.LENGTH_SHORT).show()
         }
+    }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                settingsViewModel.getOrder(requireContext()).collect {
-                    order = it
-                    viewBinding.popularState.text = it
-                }
-            }
-        }
+    override fun onDestroyView() {
+        _viewBinding = null
+        super.onDestroyView()
     }
 }

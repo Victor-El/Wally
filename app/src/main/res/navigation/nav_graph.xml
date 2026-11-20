@@ -45,9 +45,6 @@
         <action
             android:id="@+id/action_settingsFragment_to_imageTypeDialog"
             app:destination="@id/imageTypeDialog" />
-        <action
-            android:id="@+id/action_settingsFragment_to_orderDialog"
-            app:destination="@id/orderDialog" />
     </fragment>
     <dialog
         android:id="@+id/orientationDialog"
@@ -63,14 +60,6 @@
         android:label="ImageTypeDialog" >
         <argument
             android:name="imageType"
-            app:argType="string" />
-    </dialog>
-    <dialog
-        android:id="@+id/orderDialog"
-        android:name="com.turingheights.wally.settings.views.dialogs.OrderDialog"
-        android:label="OrderDialog" >
-        <argument
-            android:name="order"
             app:argType="string" />
     </dialog>
     <fragment
